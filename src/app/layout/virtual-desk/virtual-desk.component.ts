@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { ShellNavigationService } from '../shell/shell-navigation.service';
 import { IconComponent } from '../../shared/ui/icon/icon.component';
@@ -120,7 +121,7 @@ type DeskCard = {
 
             <div class="grid gap-siaf-md">
               @for (card of wideCards; track card.title) {
-                <siaf-desk-card variant="shortcut" [title]="card.title" [icon]="card.icon" [tone]="card.tone" />
+                <siaf-desk-card variant="shortcut" [title]="card.title" [icon]="card.icon" [tone]="card.tone" [interactive]="card.title === 'Consulta y Reportes'" (activated)="abrirConsultasReportes()" />
               }
             </div>
           </div>
@@ -131,6 +132,7 @@ type DeskCard = {
 })
 export class VirtualDeskComponent implements OnInit {
   private readonly shellNavigation = inject(ShellNavigationService);
+  private readonly router = inject(Router);
   private readonly solicitudesFacade = inject(SolicitudesFacadeService);
   private readonly solicitudesState = inject(SolicitudesStateService);
   private readonly permissionService = inject(PermissionService);
@@ -197,6 +199,10 @@ export class VirtualDeskComponent implements OnInit {
 
   openProcessMenu(): void {
     this.shellNavigation.openProcessMenu();
+  }
+
+  abrirConsultasReportes(): void {
+    void this.router.navigate(['/procesos/catalogos/relacion-perfil-ambito-categoria-presupuestaria/consultas-reportes']);
   }
 
   asString(v: string | number | string[]): string {

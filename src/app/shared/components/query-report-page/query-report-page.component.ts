@@ -158,8 +158,8 @@ let siguienteId = 0;
     <siaf-page-shell [breadcrumbs]="configuracion().breadcrumbs">
       <siaf-page-header pageHeader [title]="configuracion().title">
         <div actions class="flex flex-wrap items-center justify-end gap-siaf-sm">
-          <siaf-button variant="outline" icon="bookmark_border" [disabled]="!parametros()" (click)="favoritesRequested.emit()">Favoritos</siaf-button>
-          <siaf-button variant="filled" icon="manage_search" (click)="panelAbierto.set(true)">Parámetros</siaf-button>
+          @if (configuracion().showFavorites !== false) { <siaf-button variant="outline" icon="bookmark_border" [disabled]="!parametros()" (click)="favoritesRequested.emit()">Favoritos</siaf-button> }
+          <siaf-button variant="filled" icon="manage_search" (click)="panelAbierto.set(true)">{{ configuracion().searchActionLabel ?? 'Parámetros' }}</siaf-button>
         </div>
       </siaf-page-header>
 
@@ -374,6 +374,7 @@ let siguienteId = 0;
 
     <siaf-query-parameters-panel
       [open]="panelAbierto()"
+      [title]="configuracion().parameterPanelTitle ?? 'Parámetros de consulta'"
       [fields]="configuracion().parameterFields"
       [values]="parametros()"
       (closed)="panelAbierto.set(false)"

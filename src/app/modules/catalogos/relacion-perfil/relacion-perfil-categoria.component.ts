@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { DateTimePickerComponent } from '../../../shared/ui/date-time-picker/date-time-picker.component';
@@ -56,7 +57,7 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
 
               <div class="grid gap-siaf-xs"><h2 class="m-0 text-xs font-bold text-[var(--sys-color-text-neutral-high)]">Ámbito de categoría presupuestaria</h2><div class="grid gap-0.5 px-siaf-md"><span class="text-[10px] text-[var(--sys-color-text-neutral-low)]">Ámbito</span><span class="text-xs text-[var(--sys-color-text-neutral-medium)]">{{ registro.ambito }}</span></div></div>
 
-              <section class="grid gap-siaf-md" aria-labelledby="vigencia-detalle"><h2 id="vigencia-detalle" class="m-0 text-xs font-bold uppercase text-[var(--sys-color-text-neutral-high)]">Vigencia</h2><div class="grid gap-siaf-md sm:grid-cols-3"><div class="grid gap-0.5 px-siaf-md"><span class="text-[10px] text-[var(--sys-color-text-neutral-low)]">Estado</span><span class="text-xs">{{ registro.estado }}</span></div><div class="grid gap-0.5 px-siaf-md"><span class="text-[10px] text-[var(--sys-color-text-neutral-low)]">Fecha desde</span><span class="text-xs">19/08/2025</span></div><div class="grid gap-0.5 px-siaf-md"><span class="text-[10px] text-[var(--sys-color-text-neutral-low)]">Fecha hasta</span><span class="text-xs">--/--/----</span></div></div></section>
+              <section class="grid gap-siaf-md" aria-labelledby="vigencia-detalle"><h2 id="vigencia-detalle" class="m-0 text-xs font-bold uppercase text-[var(--sys-color-text-neutral-high)]">Vigencia</h2><div class="grid gap-siaf-md sm:grid-cols-3"><div class="grid gap-0.5 px-siaf-md"><span class="text-[10px] text-[var(--sys-color-text-neutral-low)]">Estado</span><span class="text-xs">{{ registro.estado }}</span></div><div class="grid gap-0.5 px-siaf-md"><span class="text-[10px] text-[var(--sys-color-text-neutral-low)]">Fecha desde</span><span class="text-xs">19/08/2026</span></div><div class="grid gap-0.5 px-siaf-md"><span class="text-[10px] text-[var(--sys-color-text-neutral-low)]">Fecha hasta</span><span class="text-xs">{{ solicitudAceptada() && esModificacion() ? formatearFecha(fechaHasta()) : '--/--/----' }}</span></div></div></section>
             </div>
           </section>
         </main>
@@ -67,7 +68,7 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
             <h1 class="m-0 max-w-[580px] text-base font-bold uppercase leading-5 tracking-[0.02px] text-[var(--sys-color-text-neutral-high)]">
               Solicitud de relación perfil por ámbito de categoría presupuestaria
             </h1>
-            <p class="m-0 text-[11px] font-normal uppercase leading-normal tracking-[0.66px] text-[var(--sys-color-text-neutral-low)]">Creación</p>
+            <p class="m-0 text-[11px] font-normal uppercase leading-normal tracking-[0.66px] text-[var(--sys-color-text-neutral-low)]">{{ esModificacion() ? 'Modificación' : 'Creación' }}</p>
           </div>
           @if (!solicitudEliminada() && !solicitudAceptada()) { <span class="mt-siaf-xxs shrink-0 rounded-siaf-sm border border-[var(--sys-color-border-states-enabled)] px-siaf-sm py-siaf-xxs text-xs font-normal leading-normal text-white" [class.bg-[var(--sys-color-bg-brand-primary)]]="solicitudEnEdicion()" [class.bg-[var(--sys-color-bg-brand-accent)]]="!solicitudEnEdicion()">{{ solicitudEnEdicion() ? 'Edición' : 'Nuevo' }}</span> }
         </div>
@@ -114,15 +115,18 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
           <section class="mt-siaf-md rounded-siaf-md bg-surface" aria-labelledby="registro-title">
             <div class="flex min-h-14 items-center gap-siaf-md px-siaf-lg py-siaf-md">
               <h2 id="registro-title" class="m-0 flex-1 text-base font-bold uppercase tracking-[0.02px] text-[var(--sys-color-text-neutral-high)]">
-                Registro de relación perfil por ámbito de categoría presupuestaria
+                {{ esModificacion() ? 'Modificación' : 'Registro' }} de relación perfil por ámbito de categoría presupuestaria
               </h2>
-              @if (!solicitudElaborada()) { <siaf-button ariaLabel="Añadir nuevo registro" [iconOnly]="true" icon="add" (click)="nuevoRegistro()" /> }
+              @if (!solicitudElaborada()) {
+                @if (esModificacion()) { <siaf-button ariaLabel="Buscar registro para modificar" [iconOnly]="true" icon="search" (click)="abrirSeleccionRegistro()" /> }
+                @else { <siaf-button ariaLabel="Añadir nuevo registro" [iconOnly]="true" icon="add" (click)="nuevoRegistro()" /> }
+              }
             </div>
 
             @if (!registroGuardado()) {
               <div class="px-siaf-lg pb-siaf-lg">
                 <div class="rounded-siaf-md bg-[var(--sys-color-bg-surfaces-surface-low)] p-siaf-md text-sm text-[var(--sys-color-text-neutral-medium)]">
-                  Por favor, haga clic en el botón (+) para añadir el registro.
+                  {{ esModificacion() ? 'No se ha seleccionado ningún tipo. Haga clic en el botón para realizar una selección.' : 'Por favor, haga clic en el botón (+) para añadir el registro.' }}
                 </div>
               </div>
             } @else {
@@ -164,8 +168,8 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
                           <td class="px-siaf-md py-siaf-sm">{{ registro.perfil }}</td>
                           <td class="px-siaf-md py-siaf-sm">{{ registro.ambito }}</td>
                           <td class="px-siaf-md py-siaf-sm">{{ registro.estado }}</td>
-                          <td class="px-siaf-md py-siaf-sm">{{ solicitudAceptada() ? '19/08/2026' : '--/--/----' }}</td>
-                          <td class="px-siaf-md py-siaf-sm">--/--/----</td>
+                          <td class="px-siaf-md py-siaf-sm">19/08/2026</td>
+                          <td class="px-siaf-md py-siaf-sm">{{ solicitudAceptada() && esModificacion() ? formatearFecha(fechaHasta()) : '--/--/----' }}</td>
                         </tr>
                       }
                     </tbody>
@@ -181,10 +185,10 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
         } @else {
           <section class="mt-siaf-md rounded-siaf-md bg-surface p-siaf-md" aria-labelledby="registro-creacion-title">
             <div class="mb-siaf-md flex min-h-10 items-center justify-between gap-siaf-md">
-              <h2 id="registro-creacion-title" class="m-0 flex-1 text-sm font-bold uppercase text-[var(--sys-color-text-neutral-high)]">Registro de relación perfil por ámbito de categoría presupuestaria</h2>
+              <h2 id="registro-creacion-title" class="m-0 flex-1 text-sm font-bold uppercase text-[var(--sys-color-text-neutral-high)]">{{ esModificacion() ? 'Modificación' : 'Registro' }} de relación perfil por ámbito de categoría presupuestaria</h2>
               <div class="flex items-center gap-siaf-sm">
                 <siaf-button variant="secondary" size="sm" (click)="cancelarEdicion()">Cancelar</siaf-button>
-                <siaf-button size="sm" [disabled]="!ambito()" (click)="guardarRegistro()">Aceptar</siaf-button>
+                <siaf-button size="sm" [disabled]="esModificacion() ? vigencia() === vigenciaOriginal() : !ambito()" (click)="guardarRegistro()">Aceptar</siaf-button>
               </div>
             </div>
 
@@ -204,7 +208,7 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
                         <span class="text-[10px] font-medium uppercase tracking-[0.06em] text-[var(--sys-color-text-neutral-low)]">Nombre proceso/procedimiento</span>
                         <strong class="text-xs text-[var(--sys-color-text-neutral-high)]">{{ procesoSeleccionado() }}</strong>
                       </div>
-                      <button class="absolute right-siaf-sm inline-flex size-8 items-center justify-center rounded-siaf-sm text-[var(--sys-color-text-neutral-medium)] hover:bg-[var(--sys-color-bg-states-light-hover)]" type="button" aria-label="Limpiar proceso seleccionado" (click)="limpiarProceso()">
+                      <button class="absolute right-siaf-sm inline-flex size-8 items-center justify-center rounded-siaf-sm text-[var(--sys-color-text-neutral-medium)] hover:bg-[var(--sys-color-bg-states-light-hover)] disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="Limpiar proceso seleccionado" [disabled]="esModificacion()" (click)="limpiarProceso()">
                         <siaf-icon name="close" [size]="20" />
                       </button>
                     </div>
@@ -213,7 +217,7 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
                       No se ha seleccionado ninguna opción. Haga clic en el botón para realizar una selección.
                     </div>
                   }
-                  <siaf-button ariaLabel="Seleccionar proceso o procedimiento" [iconOnly]="true" icon="search" [disabled]="!!procesoSeleccionado()" (click)="abrirPanelProceso()" />
+                  <siaf-button ariaLabel="Seleccionar proceso o procedimiento" [iconOnly]="true" icon="search" [disabled]="esModificacion() || !!procesoSeleccionado()" (click)="abrirPanelProceso()" />
                 </div>
               </div>
 
@@ -231,7 +235,7 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
                         <span class="text-[10px] font-medium uppercase tracking-[0.06em] text-[var(--sys-color-text-neutral-low)]">Perfil</span>
                         <strong class="text-xs text-[var(--sys-color-text-neutral-high)]">{{ perfilValor() }}</strong>
                       </div>
-                      <button class="absolute right-siaf-sm inline-flex size-8 items-center justify-center rounded-siaf-sm text-[var(--sys-color-text-neutral-medium)] hover:bg-[var(--sys-color-bg-states-light-hover)]" type="button" aria-label="Limpiar rol y perfil seleccionados" (click)="limpiarRol()">
+                      <button class="absolute right-siaf-sm inline-flex size-8 items-center justify-center rounded-siaf-sm text-[var(--sys-color-text-neutral-medium)] hover:bg-[var(--sys-color-bg-states-light-hover)] disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="Limpiar rol y perfil seleccionados" [disabled]="esModificacion()" (click)="limpiarRol()">
                         <siaf-icon name="close" [size]="20" />
                       </button>
                     </div>
@@ -240,7 +244,7 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
                       No se ha seleccionado ninguna opción. Haga clic en el botón para realizar una selección.
                     </div>
                   }
-                  <siaf-button ariaLabel="Seleccionar rol y perfil" [iconOnly]="true" icon="search" [disabled]="!procesoSeleccionado() || !!rolSeleccionado()" (click)="abrirPanelRol()" />
+                  <siaf-button ariaLabel="Seleccionar rol y perfil" [iconOnly]="true" icon="search" [disabled]="esModificacion() || !procesoSeleccionado() || !!rolSeleccionado()" (click)="abrirPanelRol()" />
                 </div>
               </div>
 
@@ -249,7 +253,7 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
                 <siaf-input
                   placeholder="Ámbito"
                   type="select"
-                  [disabled]="modoEdicion()"
+                  [disabled]="esModificacion() || modoEdicion()"
                   [autoSuccess]="false"
                   [options]="ambitos"
                   [value]="ambito()"
@@ -268,7 +272,7 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
               </fieldset>
 
               <div class="grid gap-siaf-xs">
-                <h3 class="m-0 text-xs font-bold uppercase text-[var(--sys-color-text-neutral-high)]">Detalle de creación</h3>
+                <h3 class="m-0 text-xs font-bold uppercase text-[var(--sys-color-text-neutral-high)]">Detalle de {{ esModificacion() ? 'modificación' : 'creación' }}</h3>
                 <text-area-control
                   placeholder="Descripción"
                   [maxlength]="300"
@@ -288,6 +292,27 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
         }
       </main>
       }
+
+      <siaf-selection-side-nav
+        [open]="seleccionRegistroAbierta()"
+        title="Seleccionar registro"
+        mode="single"
+        [rows]="registrosDisponibles"
+        [columns]="columnasRegistroModificacion"
+        idKey="codigo"
+        [selectedIds]="registroTemporal() ? [registroTemporal()] : []"
+        [paginated]="true"
+        [pageSize]="25"
+        [totalItems]="registrosDisponibles.length"
+        [totalPages]="1"
+        [rowsPerPage]="25"
+        [showRowsPerPage]="true"
+        [searchValue]="busquedaRegistro()"
+        (searchChange)="busquedaRegistro.set($event)"
+        (selectionChange)="actualizarRegistroTemporal($event)"
+        (closed)="cerrarSeleccionRegistro()"
+        (accepted)="aceptarSeleccionRegistro()"
+      />
 
       <siaf-selection-side-nav
         [open]="panelProcesoAbierto()"
@@ -420,16 +445,20 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
         <siaf-snackbar [open]="avisoSolicitudElaboradaVisible()" variant="creation-elaborated" requestNumber="0001" (closed)="avisoSolicitudElaboradaVisible.set(false)" />
         <siaf-snackbar [open]="avisoCambiosVisible()" variant="changes-saved" (closed)="avisoCambiosVisible.set(false)" />
         <siaf-snackbar [open]="avisoSolicitudEliminadaVisible()" variant="creation-deleted" requestNumber="0001" (closed)="avisoSolicitudEliminadaVisible.set(false)" />
-        <siaf-snackbar [open]="avisoSolicitudAceptadaVisible()" variant="creation-approved" requestNumber="0001" (closed)="avisoSolicitudAceptadaVisible.set(false)" />
+        <siaf-snackbar [open]="avisoSolicitudAceptadaVisible()" [variant]="esModificacion() ? 'modification-approved' : 'creation-approved'" requestNumber="0001" (closed)="avisoSolicitudAceptadaVisible.set(false)" />
       </div>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RelacionPerfilCategoriaComponent {
+  private readonly route = inject(ActivatedRoute);
+  /** El Panel abre este flujo con `actionType=modificacion`; sin ese parámetro conserva Creación. */
+  readonly esModificacion = signal(false);
   readonly enCreacion = signal(false);
   readonly ambito = signal('');
   readonly vigencia = signal('si');
+  readonly vigenciaOriginal = signal('si');
   readonly fechaDesde = signal('');
   readonly fechaHasta = signal('');
   readonly descripcion = signal('');
@@ -466,6 +495,24 @@ export class RelacionPerfilCategoriaComponent {
   readonly modoEdicion = signal(false);
   readonly indiceRegistroEnEdicion = signal<number | null>(null);
   readonly ramasContraidas = signal<string[]>([]);
+  readonly seleccionRegistroAbierta = signal(false);
+  readonly registroTemporal = signal('');
+  readonly busquedaRegistro = signal('');
+
+  readonly registrosDisponibles = [
+    { codigo: '15', proceso: '15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Sí' },
+    { codigo: '16', proceso: '16 Clasificador de Ingresos', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '2 APNOP', estado: 'Sí' },
+    { codigo: '17', proceso: '17 Clasificador Objeto de Gasto', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '2 APNOP', estado: 'Sí' },
+    { codigo: '18', proceso: '18 Clasificador Mancomunidades', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Sí' },
+  ];
+
+  readonly columnasRegistroModificacion: SelectionColumn[] = [
+    { key: 'proceso', label: 'Proceso/Procedimiento', widthClass: 'w-[29%]' },
+    { key: 'rol', label: 'Rol', widthClass: 'w-[14%]' },
+    { key: 'perfil', label: 'Perfil', widthClass: 'w-[28%]' },
+    { key: 'ambito', label: 'Ámbito de categoría presupuestaria', widthClass: 'w-[18%]' },
+    { key: 'estado', label: 'Vigencia', widthClass: 'w-[11%]' },
+  ];
 
   readonly ambitos = [
     { label: '1 PP', value: '1 PP' },
@@ -508,6 +555,14 @@ export class RelacionPerfilCategoriaComponent {
     { id: 'creador-entidad-pliego', proceso: '15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '7 Entidad Pliego', nombreCorto: 'EP' },
   ];
 
+  constructor() {
+    this.route.queryParamMap.subscribe((params) => {
+      const esModificacion = params.get('actionType') === 'modificacion';
+      this.esModificacion.set(esModificacion);
+      if (esModificacion) this.iniciarModificacion();
+    });
+  }
+
   get procesosVisibles() {
     const contraidas = this.ramasContraidas();
     let raizActual = '';
@@ -529,6 +584,7 @@ export class RelacionPerfilCategoriaComponent {
     this.limpiarRol();
     this.ambito.set('');
     this.vigencia.set('si');
+    this.vigenciaOriginal.set('si');
     this.fechaDesde.set('');
     this.fechaHasta.set('');
     this.descripcion.set('');
@@ -538,12 +594,44 @@ export class RelacionPerfilCategoriaComponent {
     this.abrirCreacion();
   }
 
+  abrirSeleccionRegistro(): void {
+    this.registroTemporal.set('');
+    this.busquedaRegistro.set('');
+    this.seleccionRegistroAbierta.set(true);
+  }
+
+  cerrarSeleccionRegistro(): void {
+    this.seleccionRegistroAbierta.set(false);
+    this.registroTemporal.set('');
+    this.busquedaRegistro.set('');
+  }
+
+  seleccionarRegistroTemporal(codigo: string): void {
+    this.registroTemporal.set(codigo);
+  }
+
+  actualizarRegistroTemporal(ids: string[]): void {
+    this.registroTemporal.set(ids[0] || '');
+  }
+
+  aceptarSeleccionRegistro(): void {
+    const registro = this.registrosDisponibles.find((item) => item.codigo === this.registroTemporal());
+    if (!registro) return;
+    this.registros.set([registro]);
+    this.registroGuardado.set(true);
+    // La relación vigente conserva su fecha de inicio durante todo el flujo de modificación.
+    this.fechaDesde.set(registro.estado === 'Sí' ? '2026-08-19' : '');
+    this.seleccionRegistroAbierta.set(false);
+    this.registroTemporal.set('');
+  }
+
   cancelarEdicion(): void {
     this.enCreacion.set(false);
+    if (this.esModificacion()) this.iniciarModificacion();
   }
 
   guardarRegistro(): void {
-    if (!this.ambito()) {
+    if (!this.ambito() || (this.esModificacion() && this.vigencia() === this.vigenciaOriginal())) {
       return;
     }
     const registro = { codigo: this.procesoCodigo(), proceso: this.procesoSeleccionado(), rol: this.rolValor(), perfil: this.perfilValor(), ambito: this.ambito(), estado: this.vigencia() === 'si' ? 'Sí' : 'No' };
@@ -580,6 +668,10 @@ export class RelacionPerfilCategoriaComponent {
   }
 
   cancelarEdicionSolicitud(): void {
+    if (this.esModificacion()) {
+      this.iniciarModificacion();
+      return;
+    }
     this.solicitudEnEdicion.set(false);
     this.registrosSeleccionados.set([]);
     this.cambiosEdicionPendientes.set(false);
@@ -604,8 +696,32 @@ export class RelacionPerfilCategoriaComponent {
   confirmarVerificacion(): void {
     this.confirmacionVerificacionAbierta.set(false);
     this.solicitudAceptada.set(true);
+    // La modificación entra en vigencia al ser aceptada y desde entonces expone su fecha de término.
+    if (this.esModificacion()) this.fechaHasta.set('2026-08-20');
     this.avisoSolicitudElaboradaVisible.set(false);
     this.avisoSolicitudAceptadaVisible.set(true);
+  }
+
+  /** Cada entrada desde el Panel abre la página 1: sin selección ni estados arrastrados de otra solicitud. */
+  private iniciarModificacion(): void {
+    this.enCreacion.set(false);
+    this.registroGuardado.set(false);
+    this.registros.set([]);
+    this.registrosSeleccionados.set([]);
+    this.solicitudElaborada.set(false);
+    this.solicitudEnEdicion.set(false);
+    this.solicitudEliminada.set(false);
+    this.solicitudAceptada.set(false);
+    this.fechaHasta.set('');
+    this.fechaDesde.set('');
+    this.descripcion.set('');
+    this.limpiarProceso();
+    this.limpiarRol();
+    this.ambito.set('');
+    this.vigencia.set('si');
+    this.vigenciaOriginal.set('si');
+    this.cambiosEdicionPendientes.set(false);
+    this.detalleRegistro.set(null);
   }
 
   puedeSeleccionarRegistros(): boolean {
@@ -639,6 +755,8 @@ export class RelacionPerfilCategoriaComponent {
     this.rolSeleccionado.set(`${registro.rol} · ${registro.perfil}`);
     this.ambito.set(registro.ambito);
     this.vigencia.set(registro.estado === 'Sí' ? 'si' : 'no');
+    this.vigenciaOriginal.set(registro.estado === 'Sí' ? 'si' : 'no');
+    this.fechaDesde.set(registro.estado === 'Sí' ? '2026-08-19' : '');
     this.indiceRegistroEnEdicion.set(indice);
     this.modoEdicion.set(true);
     this.enCreacion.set(true);
@@ -752,5 +870,10 @@ export class RelacionPerfilCategoriaComponent {
 
   private codigoDeProceso(texto: string): string {
     return texto.match(/^\d+/)?.[0] ?? texto.match(/^\w+\d+(?:\.\d+)*/)?.[0] ?? '';
+  }
+
+  formatearFecha(fecha: string): string {
+    const match = fecha.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    return match ? `${match[3]}/${match[2]}/${match[1]}` : fecha;
   }
 }

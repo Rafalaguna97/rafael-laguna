@@ -10,6 +10,13 @@ export const TESORERIA_ROUTES: Routes = [
       ),
   },
   {
+    path: 'procesos/catalogos/relacion-perfil-ambito-categoria-presupuestaria/consultas-reportes',
+    loadComponent: () =>
+      import('../catalogos/relacion-perfil/relacion-perfil-reportes.component').then(
+        (m) => m.RelacionPerfilReportesComponent,
+      ),
+  },
+  {
     path: 'procesos/registro-cuentas-bancarias',
     loadComponent: () =>
       import('./cuentas-bancarias/pages/documents/cuentas-bancarias-documents.component').then(

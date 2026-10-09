@@ -113,6 +113,12 @@ export type QueryReportExportFormat = 'excel' | 'csv' | 'pdf';
 export interface QueryReportConfig {
   title: string;
   breadcrumbs: BreadcrumbItem[];
+  /** Texto del botón que abre el panel lateral de criterios. */
+  searchActionLabel?: string;
+  /** Título del panel lateral de criterios. */
+  parameterPanelTitle?: string;
+  /** Oculta Favoritos cuando la consulta no maneja búsquedas guardadas. */
+  showFavorites?: boolean;
   parameterFields: QueryReportParameterField[];
   columns: QueryReportColumn[];
   /** Clave que identifica cada fila del resultado. */
