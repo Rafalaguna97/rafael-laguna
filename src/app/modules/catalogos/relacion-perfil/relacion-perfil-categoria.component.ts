@@ -396,24 +396,23 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
           </table>
         </section>
         <section selectionAdvancedFilter class="grid gap-siaf-md">
-          <fieldset class="m-0 rounded-siaf-md border border-[var(--sys-color-border-states-enabled)] bg-surface-muted px-siaf-sm pb-siaf-sm">
-            <legend class="ml-siaf-sm px-siaf-xs text-sm text-text-muted">Proceso</legend>
-            <div class="flex h-11 items-center justify-between rounded-siaf-md border-2 border-[var(--sys-color-border-states-enabled)] bg-surface px-siaf-sm text-base text-text-muted">
-              <span>Todos</span>
-              <button type="button" aria-label="Limpiar proceso" (click)="filtroProcesoBorrador.set('')"><siaf-icon name="close" [size]="28" /></button>
-            </div>
-          </fieldset>
-          <fieldset class="relative m-0 rounded-siaf-md border-2 border-[var(--sys-color-border-states-enabled)] bg-surface px-siaf-sm pb-siaf-xs">
-            <legend class="ml-siaf-sm px-siaf-xs text-sm text-text-muted">Proceso/Procedimiento</legend>
-            <select class="h-10 w-full appearance-none bg-transparent px-siaf-xs text-base text-text outline-none" [value]="filtroProcesoBorrador()" (change)="filtroProcesoBorrador.set($any($event.target).value)">
-              <option value="" disabled>Proceso/Procedimiento</option>
+          <span class="relative">
+            <select class="h-11 w-full appearance-none rounded-siaf-md border border-[var(--sys-color-border-states-enabled)] bg-surface px-siaf-sm text-sm text-text outline-none" [value]="procesoFiltroBorrador()" (change)="procesoFiltroBorrador.set($any($event.target).value)">
+              <option value="" disabled>Proceso</option>
+              <option value="Todos">Todos</option>
+            </select>
+            <siaf-icon class="pointer-events-none absolute right-siaf-sm top-1/2 -translate-y-1/2" name="keyboard_arrow_down" [size]="24" />
+          </span>
+          <span class="relative">
+            <select class="h-11 w-full appearance-none rounded-siaf-md border border-[var(--sys-color-border-states-enabled)] bg-surface px-siaf-sm text-sm text-text outline-none" [value]="filtroProcesoBorrador()" (change)="filtroProcesoBorrador.set($any($event.target).value)">
+              <option value="" disabled>Tipo de proceso</option>
               <option value="proceso">Proceso</option>
               <option value="procedimiento">Procedimiento</option>
               <option value="clasificadores">Clasificadores</option>
               <option value="catalogos">Catálogos</option>
             </select>
-            <siaf-icon class="pointer-events-none absolute right-[34px] -mt-[34px]" name="keyboard_arrow_down" [size]="28" />
-          </fieldset>
+            <siaf-icon class="pointer-events-none absolute right-siaf-sm top-1/2 -translate-y-1/2" name="keyboard_arrow_down" [size]="24" />
+          </span>
         </section>
       </siaf-selection-side-nav>
 
@@ -504,6 +503,7 @@ export class RelacionPerfilCategoriaComponent {
   readonly busquedaProceso = signal('');
   readonly filtroProceso = signal('todos');
   readonly filtroProcesoBorrador = signal('todos');
+  readonly procesoFiltroBorrador = signal('');
   readonly filtroAvanzadoAbierto = signal(false);
   readonly filtroProcesoAplicado = signal(false);
   readonly busquedaRol = signal('');
@@ -588,7 +588,7 @@ export class RelacionPerfilCategoriaComponent {
     { id: 'ct-16', nivel: 1, texto: 'CEL-001-CT16 Catálogo de Indicadores' },
     { id: 'ct-17', nivel: 1, texto: 'CEL-001-CT17 Catálogo Relación de Ingresos por Fuente' },
     { id: 'ct-18', nivel: 1, texto: 'CEL-001-CT18 Catálogo Relación de Objeto del Gasto por Fuente' },
-    { id: 'ct-28', nivel: 1, texto: 'CEL-001-CT28 Catálogo Ámbito Categoría Presupuestal' },
+    { id: 'ct-28', nivel: 1, texto: 'CEL-001-CT28 Catálogo Ámbito Categoría Presupuestaria' },
   ];
 
   readonly columnasRol: SelectionColumn[] = [
@@ -847,9 +847,10 @@ export class RelacionPerfilCategoriaComponent {
 
   abrirPanelProceso(): void {
     this.procesosSeleccionados.set([]);
-    this.busquedaProceso.set('Todos');
+    this.busquedaProceso.set('');
     this.filtroProceso.set('todos');
     this.filtroProcesoBorrador.set('');
+    this.procesoFiltroBorrador.set('');
     this.filtroAvanzadoAbierto.set(false);
     this.filtroProcesoAplicado.set(false);
     this.panelProcesoAbierto.set(true);
@@ -880,6 +881,7 @@ export class RelacionPerfilCategoriaComponent {
   limpiarFiltroProceso(): void {
     this.filtroProceso.set('todos');
     this.filtroProcesoBorrador.set('');
+    this.procesoFiltroBorrador.set('');
     this.filtroProcesoAplicado.set(true);
   }
 
