@@ -38,7 +38,7 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
           <section class="rounded-siaf-md bg-surface p-siaf-md" aria-label="Detalle del registro">
             <div class="grid gap-siaf-lg">
               <div class="grid gap-siaf-xs">
-                <h2 class="m-0 text-xs font-bold text-[var(--sys-color-text-neutral-high)]">Proceso/Procedimiento</h2>
+                <h2 class="m-0 text-xs font-bold text-[var(--sys-color-text-neutral-high)]">Proceso</h2>
                 <div class="relative flex min-h-[52px] items-center rounded-siaf-md border border-[var(--sys-color-border-states-enabled)] bg-surface pl-siaf-md">
                   <span class="absolute inset-y-siaf-sm left-0 w-0.5 rounded-r bg-[var(--sys-color-border-states-active)]"></span>
                   <div class="grid w-[200px] gap-0.5"><span class="text-[10px] font-medium uppercase tracking-[0.06em] text-[var(--sys-color-text-neutral-low)]">Código</span><strong class="text-xs">{{ registro.codigo }}</strong></div>
@@ -147,7 +147,7 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
                     <thead class="bg-[var(--sys-color-bg-surfaces-surface-high)] font-bold uppercase text-[var(--sys-color-text-neutral-high)]">
                       <tr class="h-8 border-b border-[var(--sys-color-divider-default)]">
                         @if (puedeSeleccionarRegistros()) { <th class="w-12" rowspan="2"></th> }
-                        <th class="border-r border-[var(--sys-color-divider-default)] px-siaf-md" rowspan="2">Proceso/Procedimiento</th>
+                        <th class="border-r border-[var(--sys-color-divider-default)] px-siaf-md" rowspan="2">Proceso</th>
                         <th class="border-r border-[var(--sys-color-divider-default)] px-siaf-md" rowspan="2">Rol</th>
                         <th class="border-r border-[var(--sys-color-divider-default)] px-siaf-md" rowspan="2">Perfil</th>
                         <th class="border-r border-[var(--sys-color-divider-default)] px-siaf-md" rowspan="2">Ámbito de categoría presupuestaria</th>
@@ -195,7 +195,7 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
             <div class="grid gap-siaf-lg">
               <h3 id="detalle-title" class="m-0 text-xs font-bold uppercase text-[var(--sys-color-text-neutral-high)]">Detalle</h3>
               <div class="grid gap-siaf-xs">
-                <label class="text-xs font-bold text-[var(--sys-color-text-neutral-high)]">Proceso/Procedimiento <span class="text-[var(--sys-color-text-feedback-danger)]">*</span></label>
+                <label class="text-xs font-bold text-[var(--sys-color-text-neutral-high)]">Proceso <span class="text-[var(--sys-color-text-feedback-danger)]">*</span></label>
                 <div class="flex items-center gap-siaf-xs">
                   @if (procesoSeleccionado()) {
                     <div class="relative flex min-h-[52px] flex-1 items-center rounded-siaf-md border border-[var(--sys-color-border-states-enabled)] bg-surface pl-siaf-md pr-12">
@@ -205,7 +205,7 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
                         <strong class="text-xs text-[var(--sys-color-text-neutral-high)]">{{ procesoCodigo() }}</strong>
                       </div>
                       <div class="grid min-w-0 flex-1 gap-0.5">
-                        <span class="text-[10px] font-medium uppercase tracking-[0.06em] text-[var(--sys-color-text-neutral-low)]">Nombre proceso/procedimiento</span>
+                        <span class="text-[10px] font-medium uppercase tracking-[0.06em] text-[var(--sys-color-text-neutral-low)]">Nombre</span>
                         <strong class="text-xs text-[var(--sys-color-text-neutral-high)]">{{ procesoSeleccionado() }}</strong>
                       </div>
                       <button class="absolute right-siaf-sm inline-flex size-8 items-center justify-center rounded-siaf-sm text-[var(--sys-color-text-neutral-medium)] hover:bg-[var(--sys-color-bg-states-light-hover)] disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="Limpiar proceso seleccionado" [disabled]="esModificacion()" (click)="limpiarProceso()">
@@ -316,69 +316,108 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
 
       <siaf-selection-side-nav
         [open]="panelProcesoAbierto()"
-        title="Seleccionar proceso/procedimiento"
+        title="Seleccionar proceso"
         mode="single"
         [customTable]="true"
         [selectedIds]="procesosSeleccionados()"
         [paginated]="true"
         [pageSize]="10"
-        [totalItems]="10"
+        [totalItems]="filtroProcesoAplicado() ? procesosVisibles.length : 0"
         [totalPages]="1"
         [rowsPerPage]="10"
         [showRowsPerPage]="true"
         [searchValue]="busquedaProceso()"
         (searchChange)="busquedaProceso.set($event)"
+        [showAdvancedFilter]="true"
+        [advancedFilterOpen]="filtroAvanzadoAbierto()"
+        (advancedFilterRequested)="abrirFiltroAvanzado()"
+        (advancedFilterCanceled)="cancelarFiltroAvanzado()"
+        (advancedFilterApplied)="aplicarFiltroAvanzado()"
         (closed)="cerrarPanelProceso()"
         (accepted)="aceptarProceso()"
       >
-        <table class="w-full min-w-[940px] border-collapse text-left text-sm" aria-label="Procedimientos disponibles">
-          <thead>
-            <tr class="h-10 bg-[var(--sys-color-bg-surfaces-surface-high)] text-xs font-bold uppercase text-[var(--sys-color-text-neutral-high)]">
-              <th class="w-12 rounded-l-siaf-sm"></th>
-              <th class="w-[24%] px-siaf-md">Procedimiento del nivel 01</th>
-              <th class="w-[24%] px-siaf-md">Procedimiento del nivel 02</th>
-              <th class="w-[24%] px-siaf-md">Procedimiento del nivel 03</th>
-              <th class="w-[24%] rounded-r-siaf-sm px-siaf-md">Procedimiento del nivel 04</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (proceso of procesosVisibles; track proceso.id) {
-              <tr
-                class="h-12 border-b border-[var(--sys-color-divider-default)] text-[var(--sys-color-text-neutral-medium)] transition hover:bg-[var(--sys-color-bg-states-light-hover)]"
-                [class.bg-[var(--sys-color-bg-states-light-selected)]]="estaSeleccionado(proceso.id)"
-                (click)="seleccionarProceso(proceso.id, proceso.nivel)"
-              >
-                <td class="px-siaf-sm" (click)="$event.stopPropagation()">
-                  <input
-                    class="size-5 accent-brand-primary"
-                    type="radio"
-                    name="proceso-seleccionado"
-                    [checked]="radioMarcado(proceso.id, proceso.nivel)"
-                    [attr.aria-label]="'Seleccionar ' + proceso.texto"
-                    (change)="seleccionarProceso(proceso.id, proceso.nivel)"
-                  />
-                </td>
-                <td class="px-siaf-md py-siaf-xs" [class.font-medium]="proceso.nivel === 1">
-                  @if (proceso.nivel === 1) {
-                    <button class="inline-flex items-start gap-siaf-md text-left" type="button" (click)="alternarRama(proceso.id, $event)">
-                      <siaf-icon [name]="ramaContraida(proceso.id) ? 'keyboard_arrow_down' : 'keyboard_arrow_up'" [size]="20" />
-                      {{ proceso.texto }}
-                    </button>
-                  }
-                </td>
-                <td class="px-siaf-md py-siaf-xs">
-                  @if (proceso.nivel === 2) { <span class="ml-siaf-md block border-l-2 border-b-2 border-[var(--sys-color-divider-default)] pl-siaf-md leading-5 text-justify">{{ proceso.texto }}</span> }
-                </td>
-                <td class="px-siaf-md py-siaf-xs">
-                  @if (proceso.nivel === 3) { <span class="ml-siaf-md block border-l-2 border-b-2 border-[var(--sys-color-divider-default)] pl-siaf-md leading-5 text-justify">{{ proceso.texto }}</span> }
-                </td>
-                <td class="px-siaf-md py-siaf-xs">
-                  @if (proceso.nivel === 4) { <span class="ml-siaf-md block border-l-2 border-b-2 border-[var(--sys-color-divider-default)] pl-siaf-md leading-5 text-justify">{{ proceso.texto }}</span> }
-                </td>
+        <section selectionContent>
+          @if (filtroProcesoAplicado()) {
+            <section class="mb-siaf-md flex items-center justify-between gap-siaf-sm" aria-label="Filtros aplicados de proceso">
+              <div class="flex items-center gap-siaf-sm">
+                <span class="text-xs font-bold uppercase text-[var(--sys-color-text-neutral-high)]">Filtrar por</span>
+                <span class="inline-flex h-7 items-center gap-siaf-xs rounded-siaf-sm border border-[var(--sys-color-border-states-enabled)] px-siaf-sm text-xs text-text-muted">
+                  {{ filtroProceso() === 'catalogos' ? 'Catálogos' : 'Todos' }}
+                  <button class="inline-flex" type="button" aria-label="Quitar filtro" (click)="limpiarFiltroProceso()"><siaf-icon name="close" [size]="16" /></button>
+                </span>
+              </div>
+              @if (filtroProceso() !== 'todos') {
+                <button class="rounded-siaf-sm border border-[var(--sys-color-border-states-enabled)] px-siaf-sm py-siaf-xs text-xs" type="button" (click)="limpiarFiltroProceso()">Borrar filtros <siaf-icon class="inline-block align-middle" name="close" [size]="16" /></button>
+              }
+            </section>
+          }
+          <table class="w-full min-w-[940px] border-collapse text-left text-sm" aria-label="Procesos disponibles">
+            <thead>
+              <tr class="h-10 bg-[var(--sys-color-bg-surfaces-surface-high)] text-xs font-bold uppercase text-[var(--sys-color-text-neutral-high)]">
+                <th class="w-12 rounded-l-siaf-sm"></th>
+                <th class="w-[24%] px-siaf-md">Proceso del nivel 01</th>
+                <th class="w-[24%] px-siaf-md">Proceso del nivel 02</th>
+                <th class="w-[24%] px-siaf-md">Proceso del nivel 03</th>
+                <th class="w-[24%] rounded-r-siaf-sm px-siaf-md">Proceso del nivel 04</th>
               </tr>
-            }
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              @for (proceso of procesosVisibles; track proceso.id) {
+                <tr
+                  class="h-12 border-b border-[var(--sys-color-divider-default)] text-[var(--sys-color-text-neutral-medium)] transition hover:bg-[var(--sys-color-bg-states-light-hover)]"
+                  [class.bg-[var(--sys-color-bg-states-light-selected)]]="estaSeleccionado(proceso.id)"
+                  (click)="seleccionarProceso(proceso.id, proceso.nivel)"
+                >
+                  <td class="px-siaf-sm" (click)="$event.stopPropagation()">
+                    <input
+                      class="size-5 accent-brand-primary"
+                      type="radio"
+                      name="proceso-seleccionado"
+                      [checked]="radioMarcado(proceso.id, proceso.nivel)"
+                      [attr.aria-label]="'Seleccionar ' + proceso.texto"
+                      (change)="seleccionarProceso(proceso.id, proceso.nivel)"
+                    />
+                  </td>
+                  <td class="px-siaf-md py-siaf-xs" [class.font-medium]="proceso.nivel === 1">
+                    @if (proceso.nivel === 1) {
+                      <button class="inline-flex items-start gap-siaf-md text-left" type="button" (click)="alternarRama(proceso.id, $event)">
+                        <siaf-icon [name]="ramaContraida(proceso.id) ? 'keyboard_arrow_down' : 'keyboard_arrow_up'" [size]="20" />
+                        {{ proceso.texto }}
+                      </button>
+                    }
+                  </td>
+                  <td class="px-siaf-md py-siaf-xs">
+                    @if (proceso.nivel === 2) { <span class="ml-siaf-md block border-l-2 border-b-2 border-[var(--sys-color-divider-default)] pl-siaf-md leading-5 text-justify">{{ proceso.texto }}</span> }
+                  </td>
+                  <td class="px-siaf-md py-siaf-xs">
+                    @if (proceso.nivel === 3) { <span class="ml-siaf-md block border-l-2 border-b-2 border-[var(--sys-color-divider-default)] pl-siaf-md leading-5 text-justify">{{ proceso.texto }}</span> }
+                  </td>
+                  <td class="px-siaf-md py-siaf-xs">
+                    @if (proceso.nivel === 4) { <span class="ml-siaf-md block border-l-2 border-b-2 border-[var(--sys-color-divider-default)] pl-siaf-md leading-5 text-justify">{{ proceso.texto }}</span> }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </section>
+        <section selectionAdvancedFilter class="grid gap-siaf-md">
+          <fieldset class="m-0 rounded-siaf-md border border-[var(--sys-color-border-states-enabled)] bg-surface-muted px-siaf-sm pb-siaf-sm">
+            <legend class="ml-siaf-sm px-siaf-xs text-sm text-text-muted">Proceso</legend>
+            <div class="flex h-11 items-center justify-between rounded-siaf-md border-2 border-[var(--sys-color-border-states-enabled)] bg-surface px-siaf-sm text-base text-text-muted">
+              <span>Todos</span>
+              <button type="button" aria-label="Limpiar proceso" (click)="filtroProcesoBorrador.set('')"><siaf-icon name="close" [size]="28" /></button>
+            </div>
+          </fieldset>
+          <fieldset class="relative m-0 rounded-siaf-md border-2 border-[var(--sys-color-border-states-enabled)] bg-surface px-siaf-sm pb-siaf-xs">
+            <legend class="ml-siaf-sm px-siaf-xs text-sm text-text-muted">Proceso/Procedimiento</legend>
+            <select class="h-10 w-full appearance-none bg-transparent px-siaf-xs text-base text-text outline-none" [value]="filtroProcesoBorrador()" (change)="filtroProcesoBorrador.set($any($event.target).value)">
+              <option value="" disabled>Proceso/Procedimiento</option>
+              <option value="todos">Todos</option>
+              <option value="catalogos">Catálogos</option>
+            </select>
+            <siaf-icon class="pointer-events-none absolute right-[34px] -mt-[34px]" name="keyboard_arrow_down" [size]="28" />
+          </fieldset>
+        </section>
       </siaf-selection-side-nav>
 
       <siaf-selection-side-nav
@@ -466,6 +505,10 @@ export class RelacionPerfilCategoriaComponent {
   readonly panelRolAbierto = signal(false);
   readonly procesosSeleccionados = signal<string[]>([]);
   readonly busquedaProceso = signal('');
+  readonly filtroProceso = signal('todos');
+  readonly filtroProcesoBorrador = signal('todos');
+  readonly filtroAvanzadoAbierto = signal(false);
+  readonly filtroProcesoAplicado = signal(false);
   readonly busquedaRol = signal('');
   readonly procesoSeleccionado = signal('');
   readonly procesoCodigo = signal('');
@@ -500,14 +543,14 @@ export class RelacionPerfilCategoriaComponent {
   readonly busquedaRegistro = signal('');
 
   readonly registrosDisponibles = [
-    { codigo: '15', proceso: '15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Sí' },
+    { codigo: 'CEL-001-CT15', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Sí' },
     { codigo: '16', proceso: '16 Clasificador de Ingresos', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '2 APNOP', estado: 'Sí' },
     { codigo: '17', proceso: '17 Clasificador Objeto de Gasto', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '2 APNOP', estado: 'Sí' },
     { codigo: '18', proceso: '18 Clasificador Mancomunidades', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Sí' },
   ];
 
   readonly columnasRegistroModificacion: SelectionColumn[] = [
-    { key: 'proceso', label: 'Proceso/Procedimiento', widthClass: 'w-[29%]' },
+    { key: 'proceso', label: 'Proceso', widthClass: 'w-[29%]' },
     { key: 'rol', label: 'Rol', widthClass: 'w-[14%]' },
     { key: 'perfil', label: 'Perfil', widthClass: 'w-[28%]' },
     { key: 'ambito', label: 'Ámbito de categoría presupuestaria', widthClass: 'w-[18%]' },
@@ -531,8 +574,16 @@ export class RelacionPerfilCategoriaComponent {
 
   readonly procesos = [
     { id: 'catalogos', nivel: 1, texto: 'C01.01 Catálogos' },
-    { id: 'actividades', nivel: 2, texto: '12 Catálogo de Actividades' },
-    { id: 'efp', nivel: 2, texto: '15 Catálogo de Estructura Funcional Programática - EFP' },
+    { id: 'catalogo-sectorial', nivel: 1, texto: 'CT1.13 Catálogo Sectorial' },
+    { id: 'catalogo-funcion', nivel: 1, texto: 'CT1.14 Catálogo Función' },
+    { id: 'catalogo-division-funcional', nivel: 1, texto: 'CT1.15 Catálogo División Funcional' },
+    { id: 'catalogo-grupo-funcional', nivel: 1, texto: 'CT1.16 Catálogo Grupo Funcional' },
+    { id: 'catalogo-categoria-presupuestal', nivel: 1, texto: 'CT1.17 Catálogo Categoría Presupuestal' },
+    { id: 'catalogo-ingresos-fuente', nivel: 1, texto: 'CT1.12 Catálogo Relación de Ingresos por Fuente' },
+    { id: 'catalogo-categoria-gasto', nivel: 1, texto: 'CT1.24 Catálogo Categoría del Gasto' },
+    { id: 'catalogo-tipo-gasto', nivel: 1, texto: 'CT1.25 Catálogo Tipo de Gasto' },
+    { id: 'actividades', nivel: 1, texto: 'CEL-001-CT12 Catálogo de Actividades' },
+    { id: 'efp', nivel: 1, texto: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP' },
     { id: 'programacion', nivel: 1, texto: 'M02.01 Programación de Recursos Públicos' },
     { id: 'multianual', nivel: 2, texto: 'M02.01.02 Programación Multianual, Formulación y Aprobación Presupuestaria' },
     { id: 'multianual-presupuestaria', nivel: 3, texto: 'M02.01.02.01 Programación Multianual Presupuestaria' },
@@ -547,12 +598,12 @@ export class RelacionPerfilCategoriaComponent {
   ];
 
   readonly rolesPerfil = [
-    { id: 'creador-efp-pp', proceso: '15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', nombreCorto: 'DGPP - EFP PP' },
-    { id: 'evaluador-efp-apnop-ac', proceso: '15 Catálogo de Estructura Funcional Programática - EFP', rol: '2 Evaluador', perfil: '4 Dirección General de Presupuesto Público - EFP APNOP y AC', nombreCorto: 'DGPP - EFP APNOP y AC' },
-    { id: 'aprobador-efp-pp', proceso: '15 Catálogo de Estructura Funcional Programática - EFP', rol: '2 Aprobador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', nombreCorto: 'DGPP - EFP PP' },
-    { id: 'aprobador-anulaciones', proceso: '15 Catálogo de Estructura Funcional Programática - EFP', rol: '2 Aprobador', perfil: '5 Dirección General de Presupuesto Público - Anulaciones', nombreCorto: 'DGPP - A' },
-    { id: 'creador-dgpp', proceso: '15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '6 Dirección General de Presupuesto Público', nombreCorto: 'DGPP' },
-    { id: 'creador-entidad-pliego', proceso: '15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '7 Entidad Pliego', nombreCorto: 'EP' },
+    { id: 'creador-efp-pp', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', nombreCorto: 'DGPP - EFP PP' },
+    { id: 'evaluador-efp-apnop-ac', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '2 Evaluador', perfil: '4 Dirección General de Presupuesto Público - EFP APNOP y AC', nombreCorto: 'DGPP - EFP APNOP y AC' },
+    { id: 'aprobador-efp-pp', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '2 Aprobador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', nombreCorto: 'DGPP - EFP PP' },
+    { id: 'aprobador-anulaciones', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '2 Aprobador', perfil: '5 Dirección General de Presupuesto Público - Anulaciones', nombreCorto: 'DGPP - A' },
+    { id: 'creador-dgpp', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '6 Dirección General de Presupuesto Público', nombreCorto: 'DGPP' },
+    { id: 'creador-entidad-pliego', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '7 Entidad Pliego', nombreCorto: 'EP' },
   ];
 
   constructor() {
@@ -564,9 +615,18 @@ export class RelacionPerfilCategoriaComponent {
   }
 
   get procesosVisibles() {
+    if (!this.filtroProcesoAplicado()) return [];
     const contraidas = this.ramasContraidas();
+    const terminoIngresado = this.busquedaProceso().trim().toLocaleLowerCase();
+    const termino = terminoIngresado === 'todos' ? '' : terminoIngresado;
     let raizActual = '';
     return this.procesos.filter((proceso) => {
+      if (this.filtroProceso() === 'catalogos' && ![
+        'catalogos', 'catalogo-sectorial', 'catalogo-funcion', 'catalogo-division-funcional',
+        'catalogo-grupo-funcional', 'catalogo-categoria-presupuestal', 'catalogo-ingresos-fuente',
+        'catalogo-categoria-gasto', 'catalogo-tipo-gasto', 'actividades', 'efp'
+      ].includes(proceso.id)) return false;
+      if (termino && !proceso.texto.toLocaleLowerCase().includes(termino)) return false;
       if (proceso.nivel === 1) {
         raizActual = proceso.id;
         return true;
@@ -789,11 +849,40 @@ export class RelacionPerfilCategoriaComponent {
 
   abrirPanelProceso(): void {
     this.procesosSeleccionados.set([]);
+    this.busquedaProceso.set('Todos');
+    this.filtroProceso.set('todos');
+    this.filtroProcesoBorrador.set('');
+    this.filtroAvanzadoAbierto.set(false);
+    this.filtroProcesoAplicado.set(false);
     this.panelProcesoAbierto.set(true);
   }
 
   cerrarPanelProceso(): void {
     this.panelProcesoAbierto.set(false);
+    this.filtroAvanzadoAbierto.set(false);
+  }
+
+  abrirFiltroAvanzado(): void {
+    this.filtroProcesoBorrador.set(this.filtroProceso() === 'todos' ? '' : this.filtroProceso());
+    this.filtroProcesoAplicado.set(true);
+    this.filtroAvanzadoAbierto.set(true);
+  }
+
+  cancelarFiltroAvanzado(): void {
+    this.filtroProcesoBorrador.set(this.filtroProceso() === 'todos' ? '' : this.filtroProceso());
+    this.filtroAvanzadoAbierto.set(false);
+  }
+
+  aplicarFiltroAvanzado(): void {
+    this.filtroProceso.set(this.filtroProcesoBorrador() || 'todos');
+    this.filtroProcesoAplicado.set(true);
+    this.filtroAvanzadoAbierto.set(false);
+  }
+
+  limpiarFiltroProceso(): void {
+    this.filtroProceso.set('todos');
+    this.filtroProcesoBorrador.set('');
+    this.filtroProcesoAplicado.set(true);
   }
 
   abrirPanelRol(): void {
@@ -869,7 +958,7 @@ export class RelacionPerfilCategoriaComponent {
   }
 
   private codigoDeProceso(texto: string): string {
-    return texto.match(/^\d+/)?.[0] ?? texto.match(/^\w+\d+(?:\.\d+)*/)?.[0] ?? '';
+    return texto.match(/^[A-Z]+-\d+-[A-Z]+\d+/)?.[0] ?? texto.match(/^\d+/)?.[0] ?? texto.match(/^\w+\d+(?:\.\d+)*/)?.[0] ?? '';
   }
 
   formatearFecha(fecha: string): string {

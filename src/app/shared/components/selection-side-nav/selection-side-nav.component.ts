@@ -133,12 +133,15 @@ export type SelectionMode = 'single' | 'multiple';
             </button>
           </header>
 
-          <div class="min-h-0 flex-1 overflow-y-auto px-siaf-md py-siaf-md">
-            <siaf-form-table-search
-              [value]="searchValue"
-              [ariaLabel]="searchPlaceholder"
-              (valueChange)="searchChange.emit($event)"
-            />
+          <div class="flex min-h-0 flex-1" [class.flex-col]="!showAdvancedFilter" [class.lg:flex-row]="showAdvancedFilter">
+            <div class="min-h-0 min-w-0 flex-1 overflow-y-auto px-siaf-md py-siaf-md">
+              <siaf-form-table-search
+                [value]="searchValue"
+                [ariaLabel]="searchPlaceholder"
+                [showMoreAction]="!showAdvancedFilter || advancedFilterOpen"
+                (valueChange)="searchChange.emit($event)"
+                (filter)="advancedFilterRequested.emit()"
+              />
 
             @if (mode === 'multiple' && showSelectAll) {
               <div class="mt-siaf-md">
@@ -174,7 +177,11 @@ export type SelectionMode = 'single' | 'multiple';
 
             @if (customTable) {
               <div class="mt-siaf-md">
-                <ng-content />
+                @if (showAdvancedFilter) {
+                  <ng-content select="[selectionContent]" />
+                } @else {
+                  <ng-content />
+                }
               </div>
             } @else {
             <div class="mt-siaf-md siaf-sidepanel-table-scroll">
@@ -262,18 +269,32 @@ export type SelectionMode = 'single' | 'multiple';
                 />
               </div>
             }
+            </div>
+
+            @if (showAdvancedFilter && advancedFilterOpen) {
+              <section class="flex min-h-0 shrink-0 flex-col border-t border-[var(--sys-color-divider-strong)] bg-surface lg:w-[420px] lg:border-l lg:border-t-0" aria-label="Filtro avanzado">
+                <header class="px-siaf-md pt-siaf-md"><h3 class="m-0 text-base font-bold uppercase text-text">{{ advancedFilterTitle }}</h3></header>
+                <div class="min-h-0 flex-1 overflow-y-auto px-siaf-md py-siaf-md"><ng-content select="[selectionAdvancedFilter]" /></div>
+                <footer class="flex shrink-0 justify-end gap-siaf-xs px-siaf-md py-siaf-sm">
+                  <siaf-button variant="secondary" (click)="advancedFilterCanceled.emit()">{{ advancedFilterCancelLabel }}</siaf-button>
+                  <siaf-button variant="primary" (click)="advancedFilterApplied.emit()">{{ advancedFilterApplyLabel }}</siaf-button>
+                </footer>
+              </section>
+            }
           </div>
 
-          <footer class="flex shrink-0 items-center justify-end gap-siaf-xs px-siaf-md py-siaf-sm">
-            <siaf-button variant="secondary" (click)="onCancel()">{{ cancelLabel }}</siaf-button>
-            <siaf-button
-              variant="primary"
-              [disabled]="acceptDisabled()"
-              (click)="onAccept()"
-            >
-              {{ acceptLabel }}
-            </siaf-button>
-          </footer>
+          @if (!(showAdvancedFilter && advancedFilterOpen)) {
+            <footer class="flex shrink-0 items-center justify-end gap-siaf-xs px-siaf-md py-siaf-sm">
+              <siaf-button variant="secondary" (click)="onCancel()">{{ cancelLabel }}</siaf-button>
+              <siaf-button
+                variant="primary"
+                [disabled]="acceptDisabled()"
+                (click)="onAccept()"
+              >
+                {{ acceptLabel }}
+              </siaf-button>
+            </footer>
+          }
         </aside>
       </section>
     }
@@ -326,6 +347,13 @@ export class SelectionSideNavComponent<T = Record<string, unknown>> implements O
   /** Etiquetas de botones (i18n-friendly). */
   @Input() cancelLabel = 'Cancelar';
   @Input() acceptLabel = 'Aceptar';
+  /** Habilita un panel de filtro avanzado a la derecha del selector. */
+  @Input() showAdvancedFilter = false;
+  /** Controla si el panel de filtro avanzado está visible. */
+  @Input() advancedFilterOpen = false;
+  @Input() advancedFilterTitle = 'Filtrar';
+  @Input() advancedFilterCancelLabel = 'Cancelar';
+  @Input() advancedFilterApplyLabel = 'Aplicar';
 
   /**
    * Activa la paginación. Cuando es true, las `rows` que recibe ya están
@@ -372,6 +400,10 @@ export class SelectionSideNavComponent<T = Record<string, unknown>> implements O
   @Output() closed = new EventEmitter<void>();
   /** Click en Aceptar. Emite los ids seleccionados — el padre decide si cierra. */
   @Output() accepted = new EventEmitter<string[]>();
+  /** Se emite desde el ícono Filtrar del buscador. */
+  @Output() advancedFilterRequested = new EventEmitter<void>();
+  @Output() advancedFilterCanceled = new EventEmitter<void>();
+  @Output() advancedFilterApplied = new EventEmitter<void>();
 
   /** Navegación de paginación: página anterior. */
   @Output() previousPage = new EventEmitter<void>();

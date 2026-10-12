@@ -16,10 +16,10 @@ import { IconDropdownMenuComponent } from '../../../shared/ui/icon-dropdown-menu
 import { ReportTableComponent } from '../../../shared/ui/report-table/report-table.component';
 
 const FILAS: QueryReportRow[] = [
-  { id: '1', proceso: '15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Sí', desde: '19/08/2026', hasta: '' },
-  { id: '2', proceso: '15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '4 Dirección General de Presupuesto Público - EFP APNOP y AC', ambito: '6 APNOP, AC', estado: 'Sí', desde: '19/08/2026', hasta: '' },
-  { id: '3', proceso: '15 Catálogo de Estructura Funcional Programática - EFP', rol: '2 Evaluador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Sí', desde: '19/08/2026', hasta: '' },
-  { id: '4', proceso: '15 Catálogo de Estructura Funcional Programática - EFP', rol: '3 Aprobador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Sí', desde: '19/08/2026', hasta: '' },
+  { id: '1', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Sí', desde: '19/08/2026', hasta: '' },
+  { id: '2', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '4 Dirección General de Presupuesto Público - EFP APNOP y AC', ambito: '6 APNOP, AC', estado: 'Sí', desde: '19/08/2026', hasta: '' },
+  { id: '3', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '2 Evaluador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Sí', desde: '19/08/2026', hasta: '' },
+  { id: '4', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '3 Aprobador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Sí', desde: '19/08/2026', hasta: '' },
 ];
 
 /** Consulta del catálogo de relaciones: parte desde el acceso «Consultas y reportes» del Panel. */
@@ -37,7 +37,7 @@ const FILAS: QueryReportRow[] = [
           <siaf-consultas-filtros-chips [chips]="filtrosAplicados()" (cleared)="limpiarConsulta()" />
           <section class="flex min-h-0 flex-1 flex-col rounded-siaf-md bg-surface p-siaf-lg">
             <header class="flex items-center gap-siaf-md"><h2 class="m-0 flex-1 text-base font-bold uppercase">Resultado de la búsqueda</h2><siaf-icon-dropdown-menu icon="file_download" ariaLabel="Exportar" variant="accent" density="standard" [items]="opcionesExportacion" (selected)="exportarFormato($event)" /></header>
-            <section class="mt-siaf-lg"><h3 class="m-0 text-sm font-bold uppercase">Datos</h3><div class="mt-siaf-md px-siaf-md text-sm"><span class="block text-[var(--sys-color-text-neutral-low)]">Proceso/Procedimiento</span><span>15 Catálogo de Estructura Funcional Programática - EFP</span></div></section>
+            <section class="mt-siaf-lg"><h3 class="m-0 text-sm font-bold uppercase">Datos</h3><div class="mt-siaf-md px-siaf-md text-sm"><span class="block text-[var(--sys-color-text-neutral-low)]">Proceso</span><span>CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP</span></div></section>
             <h3 class="mb-siaf-lg mt-siaf-xl text-sm font-bold uppercase">Relación perfil por ámbito de categoría presupuestaria</h3>
             <div class="relative"><siaf-form-table-search [value]="busquedaTabla()" (valueChange)="busquedaTabla.set($event)" (more)="alternarMenuTabla()" />@if (menuTablaAbierto()) { <div class="absolute right-0 top-12 z-20 w-[270px] rounded-siaf-sm bg-[var(--sys-color-bg-states-light-selected)] p-siaf-xs shadow-siaf-elevation-2"><button class="w-full rounded-siaf-sm px-siaf-sm py-siaf-md text-left text-xs font-bold text-[var(--sys-color-text-neutral-activated)]" type="button" (click)="menuTablaAbierto.set(false); abrirConfiguracion()">Configuración de tabla</button></div> }</div>
             <div class="mt-siaf-md"><siaf-filter-pill label="Estado de registro" [options]="opcionesEstado" [selectedValue]="filtroEstado()" (selectedValueChange)="filtroEstado.set($event)" /></div>
@@ -79,7 +79,7 @@ export class RelacionPerfilReportesComponent {
   readonly opcionesExportacion = [{ label: 'CSV', value: 'csv', icon: 'table_chart' }, { label: 'Excel', value: 'excel', icon: 'table_view' }, { label: 'PDF', value: 'pdf', icon: 'picture_as_pdf' }];
 
   readonly columnasBase = [
-    { key: 'proceso', label: 'Proceso/Procedimiento', width: 300 },
+    { key: 'proceso', label: 'Proceso', width: 300 },
     { key: 'rol', label: 'Rol', width: 160 },
     { key: 'perfil', label: 'Perfil', width: 300 },
     { key: 'ambito', label: 'Ámbito de categoría presupuestaria', width: 210 },
@@ -99,7 +99,7 @@ export class RelacionPerfilReportesComponent {
     parameterPanelTitle: 'Búsqueda',
     showFavorites: false,
     parameterFields: [
-      { key: 'proceso', label: 'Proceso/Procedimiento', type: 'select', required: true, icon: 'account_tree', options: [{ label: 'Todos', value: 'todos' }, { label: '12 Catálogo de Actividades', value: '12' }, { label: '15 Catálogo de Estructura Funcional Programática - EFP', value: '15' }] },
+      { key: 'proceso', label: 'Proceso', type: 'select', required: true, icon: 'account_tree', options: [{ label: 'Todos', value: 'todos' }, { label: 'CEL-001-CT12 Catálogo de Actividades', value: 'CEL-001-CT12' }, { label: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', value: 'CEL-001-CT15' }] },
       { key: 'rol', label: 'Rol', type: 'select', icon: 'badge', options: [{ label: '1 Creador', value: '1 Creador' }, { label: '2 Evaluador', value: '2 Evaluador' }, { label: '3 Aprobador', value: '3 Aprobador' }] },
       { key: 'perfil', label: 'Perfil', type: 'select', icon: 'person', options: [{ label: 'EFP PP', value: 'EFP PP' }, { label: 'EFP APNOP y AC', value: 'EFP APNOP y AC' }] },
       { key: 'ambito', label: 'Ámbito de categoría presupuestaria', type: 'select', icon: 'category', options: [{ label: '1 PP', value: '1 PP' }, { label: '6 APNOP, AC', value: '6 APNOP, AC' }] },
@@ -118,7 +118,7 @@ export class RelacionPerfilReportesComponent {
 
   readonly filtrosAplicados = computed(() => {
     const proceso = String(this.criterios()?.['proceso'] ?? '');
-    return proceso ? [{ label: 'Proceso/Procedimiento', values: [proceso === '15' ? '15 Catálogo de Estructura Funcional Programática' : proceso] }] : [];
+    return proceso ? [{ label: 'Proceso', values: [proceso === 'CEL-001-CT15' ? 'CEL-001-CT15 Catálogo de Estructura Funcional Programática' : proceso] }] : [];
   });
 
   readonly filasVisibles = computed(() => {
