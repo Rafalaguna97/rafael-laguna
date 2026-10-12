@@ -188,7 +188,7 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
               <h2 id="registro-creacion-title" class="m-0 flex-1 text-sm font-bold uppercase text-[var(--sys-color-text-neutral-high)]">{{ esModificacion() ? 'Modificación' : 'Registro' }} de relación perfil por ámbito de categoría presupuestaria</h2>
               <div class="flex items-center gap-siaf-sm">
                 <siaf-button variant="secondary" size="sm" (click)="cancelarEdicion()">Cancelar</siaf-button>
-                <siaf-button size="sm" [disabled]="esModificacion() ? vigencia() === vigenciaOriginal() : !ambito()" (click)="guardarRegistro()">Aceptar</siaf-button>
+                <siaf-button size="sm" [disabled]="esModificacion() ? vigencia() === vigenciaOriginal() : !procesoSeleccionado() || !rolSeleccionado() || !ambito()" (click)="guardarRegistro()">Aceptar</siaf-button>
               </div>
             </div>
 
@@ -206,7 +206,7 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
                       </div>
                       <div class="grid min-w-0 flex-1 gap-0.5">
                         <span class="text-[10px] font-medium uppercase tracking-[0.06em] text-[var(--sys-color-text-neutral-low)]">Nombre</span>
-                        <strong class="text-xs text-[var(--sys-color-text-neutral-high)]">{{ procesoSeleccionado() }}</strong>
+                        <strong class="text-xs text-[var(--sys-color-text-neutral-high)]">{{ nombreDeProceso(procesoSeleccionado()) }}</strong>
                       </div>
                       <button class="absolute right-siaf-sm inline-flex size-8 items-center justify-center rounded-siaf-sm text-[var(--sys-color-text-neutral-medium)] hover:bg-[var(--sys-color-bg-states-light-hover)] disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="Limpiar proceso seleccionado" [disabled]="esModificacion()" (click)="limpiarProceso()">
                         <siaf-icon name="close" [size]="20" />
@@ -264,7 +264,7 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
               <fieldset class="grid gap-siaf-md border-0 p-0">
                 <legend class="text-xs font-bold uppercase text-[var(--sys-color-text-neutral-high)]">Vigencia</legend>
                 <div class="grid gap-siaf-lg lg:grid-cols-[280px_minmax(0,1fr)_minmax(0,1fr)] lg:items-start">
-                  <siaf-radio-group label="Estado" name="estado-vigencia" [inline]="true" [options]="opcionesVigencia" [value]="vigencia()" (valueChange)="vigencia.set($event)" />
+                  <siaf-radio-group label="Estado" name="estado-vigencia" [inline]="true" [options]="opcionesVigencia" [disabled]="!esModificacion()" [value]="vigencia()" (valueChange)="vigencia.set($event)" />
                   <siaf-date-time-picker label="Fecha desde" [defaultToToday]="false" [fullWidth]="true" [value]="fechaDesde()" (valueChange)="fechaDesde.set($event)" />
                   <siaf-date-time-picker label="Fecha hasta" [defaultToToday]="false" [fullWidth]="true" [value]="fechaHasta()" (valueChange)="fechaHasta.set($event)" />
                 </div>
@@ -342,7 +342,7 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
               <div class="flex items-center gap-siaf-sm">
                 <span class="text-xs font-bold uppercase text-[var(--sys-color-text-neutral-high)]">Filtrar por</span>
                 <span class="inline-flex h-7 items-center gap-siaf-xs rounded-siaf-sm border border-[var(--sys-color-border-states-enabled)] px-siaf-sm text-xs text-text-muted">
-                  {{ filtroProceso() === 'catalogos' ? 'Catálogos' : 'Todos' }}
+                  {{ nombreFiltroProceso(filtroProceso()) }}
                   <button class="inline-flex" type="button" aria-label="Quitar filtro" (click)="limpiarFiltroProceso()"><siaf-icon name="close" [size]="16" /></button>
                 </span>
               </div>
@@ -379,12 +379,7 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
                     />
                   </td>
                   <td class="px-siaf-md py-siaf-xs" [class.font-medium]="proceso.nivel === 1">
-                    @if (proceso.nivel === 1) {
-                      <button class="inline-flex items-start gap-siaf-md text-left" type="button" (click)="alternarRama(proceso.id, $event)">
-                        <siaf-icon [name]="ramaContraida(proceso.id) ? 'keyboard_arrow_down' : 'keyboard_arrow_up'" [size]="20" />
-                        {{ proceso.texto }}
-                      </button>
-                    }
+                    @if (proceso.nivel === 1) { {{ proceso.texto }} }
                   </td>
                   <td class="px-siaf-md py-siaf-xs">
                     @if (proceso.nivel === 2) { <span class="ml-siaf-md block border-l-2 border-b-2 border-[var(--sys-color-divider-default)] pl-siaf-md leading-5 text-justify">{{ proceso.texto }}</span> }
@@ -412,7 +407,9 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
             <legend class="ml-siaf-sm px-siaf-xs text-sm text-text-muted">Proceso/Procedimiento</legend>
             <select class="h-10 w-full appearance-none bg-transparent px-siaf-xs text-base text-text outline-none" [value]="filtroProcesoBorrador()" (change)="filtroProcesoBorrador.set($any($event.target).value)">
               <option value="" disabled>Proceso/Procedimiento</option>
-              <option value="todos">Todos</option>
+              <option value="proceso">Proceso</option>
+              <option value="procedimiento">Procedimiento</option>
+              <option value="clasificadores">Clasificadores</option>
               <option value="catalogos">Catálogos</option>
             </select>
             <siaf-icon class="pointer-events-none absolute right-[34px] -mt-[34px]" name="keyboard_arrow_down" [size]="28" />
@@ -481,9 +478,9 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
       <div class="fixed bottom-siaf-xl left-1/2 z-[60] -translate-x-1/2">
         <siaf-snackbar [open]="avisoRegistroVisible()" variant="record-done" (closed)="avisoRegistroVisible.set(false)" />
         <siaf-snackbar [open]="avisoEliminacionVisible()" variant="record-deleted" (closed)="avisoEliminacionVisible.set(false)" />
-        <siaf-snackbar [open]="avisoSolicitudElaboradaVisible()" variant="creation-elaborated" requestNumber="0001" (closed)="avisoSolicitudElaboradaVisible.set(false)" />
+        <siaf-snackbar [open]="avisoSolicitudElaboradaVisible()" [variant]="esModificacion() ? 'modification-elaborated' : 'creation-elaborated'" requestNumber="0001" (closed)="avisoSolicitudElaboradaVisible.set(false)" />
         <siaf-snackbar [open]="avisoCambiosVisible()" variant="changes-saved" (closed)="avisoCambiosVisible.set(false)" />
-        <siaf-snackbar [open]="avisoSolicitudEliminadaVisible()" variant="creation-deleted" requestNumber="0001" (closed)="avisoSolicitudEliminadaVisible.set(false)" />
+        <siaf-snackbar [open]="avisoSolicitudEliminadaVisible()" [variant]="esModificacion() ? 'modification-deleted' : 'creation-deleted'" requestNumber="0001" (closed)="avisoSolicitudEliminadaVisible.set(false)" />
         <siaf-snackbar [open]="avisoSolicitudAceptadaVisible()" [variant]="esModificacion() ? 'modification-approved' : 'creation-approved'" requestNumber="0001" (closed)="avisoSolicitudAceptadaVisible.set(false)" />
       </div>
     </div>
@@ -544,9 +541,9 @@ export class RelacionPerfilCategoriaComponent {
 
   readonly registrosDisponibles = [
     { codigo: 'CEL-001-CT15', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Sí' },
-    { codigo: '16', proceso: '16 Clasificador de Ingresos', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '2 APNOP', estado: 'Sí' },
-    { codigo: '17', proceso: '17 Clasificador Objeto de Gasto', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '2 APNOP', estado: 'Sí' },
-    { codigo: '18', proceso: '18 Clasificador Mancomunidades', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Sí' },
+    { codigo: 'CEL-001-CT10', proceso: 'CEL-001-CT10 Catálogo Programas Presupuestales', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '2 APNOP', estado: 'Sí' },
+    { codigo: 'CEL-001-CT11', proceso: 'CEL-001-CT11 Catálogo Productos', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '2 APNOP', estado: 'Sí' },
+    { codigo: 'CEL-001-CT12', proceso: 'CEL-001-CT12 Catalogo Actividades', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Sí' },
   ];
 
   readonly columnasRegistroModificacion: SelectionColumn[] = [
@@ -573,21 +570,25 @@ export class RelacionPerfilCategoriaComponent {
   ];
 
   readonly procesos = [
-    { id: 'catalogos', nivel: 1, texto: 'C01.01 Catálogos' },
-    { id: 'catalogo-sectorial', nivel: 1, texto: 'CT1.13 Catálogo Sectorial' },
-    { id: 'catalogo-funcion', nivel: 1, texto: 'CT1.14 Catálogo Función' },
-    { id: 'catalogo-division-funcional', nivel: 1, texto: 'CT1.15 Catálogo División Funcional' },
-    { id: 'catalogo-grupo-funcional', nivel: 1, texto: 'CT1.16 Catálogo Grupo Funcional' },
-    { id: 'catalogo-categoria-presupuestal', nivel: 1, texto: 'CT1.17 Catálogo Categoría Presupuestal' },
-    { id: 'catalogo-ingresos-fuente', nivel: 1, texto: 'CT1.12 Catálogo Relación de Ingresos por Fuente' },
-    { id: 'catalogo-categoria-gasto', nivel: 1, texto: 'CT1.24 Catálogo Categoría del Gasto' },
-    { id: 'catalogo-tipo-gasto', nivel: 1, texto: 'CT1.25 Catálogo Tipo de Gasto' },
-    { id: 'actividades', nivel: 1, texto: 'CEL-001-CT12 Catálogo de Actividades' },
-    { id: 'efp', nivel: 1, texto: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP' },
-    { id: 'programacion', nivel: 1, texto: 'M02.01 Programación de Recursos Públicos' },
-    { id: 'multianual', nivel: 2, texto: 'M02.01.02 Programación Multianual, Formulación y Aprobación Presupuestaria' },
-    { id: 'multianual-presupuestaria', nivel: 3, texto: 'M02.01.02.01 Programación Multianual Presupuestaria' },
-    { id: 'reportes-apm', nivel: 4, texto: 'M02.01.02.01.01 Programación Multianual Presupuestaria - Gestión de Reportes de la APM' },
+    { id: 'cl-01', nivel: 1, texto: 'CEL-001-CL01 Clasificador Institucional' },
+    { id: 'cl-02', nivel: 1, texto: 'CEL-001-CL02 Clasificador Fuente de Financiamiento' },
+    { id: 'cl-03', nivel: 1, texto: 'CEL-001-CL03 Clasificador Ubicación Geográfica' },
+    { id: 'cl-04', nivel: 1, texto: 'CEL-001-CL04 Clasificador de Ingresos (Recursos por Rubro)' },
+    { id: 'cl-05', nivel: 1, texto: 'CEL-001-CL05 Clasificador de Objeto del Gasto' },
+    { id: 'cl-06', nivel: 1, texto: 'CEL-001-CL06 Clasificador Funcional' },
+    { id: 'cl-07', nivel: 1, texto: 'CEL-001-CL07 Clasificador Mancomunidades' },
+    { id: 'cl-08', nivel: 1, texto: 'CEL-001-CL08 Clasificador Programático' },
+    { id: 'ct-09', nivel: 1, texto: 'CEL-001-CT09 Catálogo de Ámbito y Grupo Ámbito de Aplicación Institucional' },
+    { id: 'ct-10', nivel: 1, texto: 'CEL-001-CT10 Catálogo Programas Presupuestales' },
+    { id: 'ct-11', nivel: 1, texto: 'CEL-001-CT11 Catálogo Productos' },
+    { id: 'ct-12', nivel: 1, texto: 'CEL-001-CT12 Catalogo Actividades' },
+    { id: 'ct-13', nivel: 1, texto: 'CEL-001-CT13 Catálogo Responsables por Equipo Trabajo' },
+    { id: 'ct-14', nivel: 1, texto: 'CEL-001-CT14 Catálogo Finalidades' },
+    { id: 'ct-15', nivel: 1, texto: 'CEL-001-CT15 Catálogo Estructura Funcional Programática - EFP' },
+    { id: 'ct-16', nivel: 1, texto: 'CEL-001-CT16 Catálogo de Indicadores' },
+    { id: 'ct-17', nivel: 1, texto: 'CEL-001-CT17 Catálogo Relación de Ingresos por Fuente' },
+    { id: 'ct-18', nivel: 1, texto: 'CEL-001-CT18 Catálogo Relación de Objeto del Gasto por Fuente' },
+    { id: 'ct-28', nivel: 1, texto: 'CEL-001-CT28 Catálogo Ámbito Categoría Presupuestal' },
   ];
 
   readonly columnasRol: SelectionColumn[] = [
@@ -621,11 +622,8 @@ export class RelacionPerfilCategoriaComponent {
     const termino = terminoIngresado === 'todos' ? '' : terminoIngresado;
     let raizActual = '';
     return this.procesos.filter((proceso) => {
-      if (this.filtroProceso() === 'catalogos' && ![
-        'catalogos', 'catalogo-sectorial', 'catalogo-funcion', 'catalogo-division-funcional',
-        'catalogo-grupo-funcional', 'catalogo-categoria-presupuestal', 'catalogo-ingresos-fuente',
-        'catalogo-categoria-gasto', 'catalogo-tipo-gasto', 'actividades', 'efp'
-      ].includes(proceso.id)) return false;
+      if (this.filtroProceso() === 'clasificadores' && !proceso.texto.startsWith('CEL-001-CL')) return false;
+      if (this.filtroProceso() === 'catalogos' && !proceso.texto.startsWith('CEL-001-CT')) return false;
       if (termino && !proceso.texto.toLocaleLowerCase().includes(termino)) return false;
       if (proceso.nivel === 1) {
         raizActual = proceso.id;
@@ -757,7 +755,7 @@ export class RelacionPerfilCategoriaComponent {
     this.confirmacionVerificacionAbierta.set(false);
     this.solicitudAceptada.set(true);
     // La modificación entra en vigencia al ser aceptada y desde entonces expone su fecha de término.
-    if (this.esModificacion()) this.fechaHasta.set('2026-08-20');
+    if (this.esModificacion()) this.fechaHasta.set('2025-08-20');
     this.avisoSolicitudElaboradaVisible.set(false);
     this.avisoSolicitudAceptadaVisible.set(true);
   }
@@ -885,6 +883,15 @@ export class RelacionPerfilCategoriaComponent {
     this.filtroProcesoAplicado.set(true);
   }
 
+  nombreFiltroProceso(valor: string): string {
+    return ({
+      proceso: 'Proceso',
+      procedimiento: 'Procedimiento',
+      clasificadores: 'Clasificadores',
+      catalogos: 'Catálogos',
+    } as Record<string, string>)[valor] ?? 'Todos';
+  }
+
   abrirPanelRol(): void {
     this.rolTemporal.set('');
     this.panelRolAbierto.set(true);
@@ -959,6 +966,11 @@ export class RelacionPerfilCategoriaComponent {
 
   private codigoDeProceso(texto: string): string {
     return texto.match(/^[A-Z]+-\d+-[A-Z]+\d+/)?.[0] ?? texto.match(/^\d+/)?.[0] ?? texto.match(/^\w+\d+(?:\.\d+)*/)?.[0] ?? '';
+  }
+
+  nombreDeProceso(texto: string): string {
+    const codigo = this.codigoDeProceso(texto);
+    return codigo ? texto.slice(codigo.length).trim() : texto;
   }
 
   formatearFecha(fecha: string): string {

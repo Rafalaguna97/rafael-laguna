@@ -4,6 +4,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 export interface RadioOption {
   label: string;
   value: string;
+  /** Deshabilita únicamente esta alternativa, sin bloquear el grupo completo. */
+  disabled?: boolean;
 }
 
 /**
@@ -70,7 +72,7 @@ export interface RadioOption {
             [name]="name"
             [value]="option.value"
             [checked]="option.value === value"
-            [disabled]="disabled"
+            [disabled]="disabled || option.disabled"
             [attr.aria-required]="required"
             (change)="selectValue(option.value)"
             (blur)="markTouched()"
@@ -118,7 +120,7 @@ export class RadioComponent implements ControlValueAccessor {
   }
 
   selectValue(value: string): void {
-    if (this.disabled) {
+    if (this.disabled || this.options.find((option) => option.value === value)?.disabled) {
       return;
     }
 
