@@ -265,8 +265,8 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
                 <legend class="text-xs font-bold uppercase text-[var(--sys-color-text-neutral-high)]">Vigencia</legend>
                 <div class="grid gap-siaf-lg lg:grid-cols-[280px_minmax(0,1fr)_minmax(0,1fr)] lg:items-start">
                   <siaf-radio-group label="Estado" name="estado-vigencia" [inline]="true" [options]="opcionesVigencia" [disabled]="!esModificacion()" [value]="vigencia()" (valueChange)="vigencia.set($event)" />
-                  <siaf-date-time-picker label="Fecha desde" [defaultToToday]="false" [fullWidth]="true" [value]="fechaDesde()" (valueChange)="fechaDesde.set($event)" />
-                  <siaf-date-time-picker label="Fecha hasta" [defaultToToday]="false" [fullWidth]="true" [value]="fechaHasta()" (valueChange)="fechaHasta.set($event)" />
+                  <siaf-date-time-picker label="Fecha desde" [defaultToToday]="false" [fullWidth]="true" [disabled]="true" [value]="fechaDesde()" />
+                  <siaf-date-time-picker label="Fecha hasta" [defaultToToday]="false" [fullWidth]="true" [disabled]="true" [value]="fechaHasta()" />
                 </div>
                 <p class="m-0 text-xs text-[var(--sys-color-text-neutral-medium)] lg:ml-[310px]">Será asignada cuando se acepte el requerimiento de solicitud</p>
               </fieldset>
@@ -337,20 +337,6 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
         (accepted)="aceptarProceso()"
       >
         <section selectionContent>
-          @if (filtroProcesoAplicado()) {
-            <section class="mb-siaf-md flex items-center justify-between gap-siaf-sm" aria-label="Filtros aplicados de proceso">
-              <div class="flex items-center gap-siaf-sm">
-                <span class="text-xs font-bold uppercase text-[var(--sys-color-text-neutral-high)]">Filtrar por</span>
-                <span class="inline-flex h-7 items-center gap-siaf-xs rounded-siaf-sm border border-[var(--sys-color-border-states-enabled)] px-siaf-sm text-xs text-text-muted">
-                  {{ nombreFiltroProceso(filtroProceso()) }}
-                  <button class="inline-flex" type="button" aria-label="Quitar filtro" (click)="limpiarFiltroProceso()"><siaf-icon name="close" [size]="16" /></button>
-                </span>
-              </div>
-              @if (filtroProceso() !== 'todos') {
-                <button class="rounded-siaf-sm border border-[var(--sys-color-border-states-enabled)] px-siaf-sm py-siaf-xs text-xs" type="button" (click)="limpiarFiltroProceso()">Borrar filtros <siaf-icon class="inline-block align-middle" name="close" [size]="16" /></button>
-              }
-            </section>
-          }
           <table class="w-full min-w-[940px] border-collapse text-left text-sm" aria-label="Procesos disponibles">
             <thead>
               <tr class="h-10 bg-[var(--sys-color-bg-surfaces-surface-high)] text-xs font-bold uppercase text-[var(--sys-color-text-neutral-high)]">
@@ -379,7 +365,12 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
                     />
                   </td>
                   <td class="px-siaf-md py-siaf-xs" [class.font-medium]="proceso.nivel === 1">
-                    @if (proceso.nivel === 1) { {{ proceso.texto }} }
+                    @if (proceso.nivel === 1 && proceso.id === 'programacion') {
+                      <button class="inline-flex items-start gap-siaf-sm text-left" type="button" (click)="alternarRama(proceso.id, $event)">
+                        <siaf-icon [name]="ramaContraida(proceso.id) ? 'keyboard_arrow_down' : 'keyboard_arrow_up'" [size]="18" />
+                        {{ proceso.texto }}
+                      </button>
+                    } @else if (proceso.nivel === 1) { {{ proceso.texto }} }
                   </td>
                   <td class="px-siaf-md py-siaf-xs">
                     @if (proceso.nivel === 2) { <span class="ml-siaf-md block border-l-2 border-b-2 border-[var(--sys-color-divider-default)] pl-siaf-md leading-5 text-justify">{{ proceso.texto }}</span> }
@@ -397,15 +388,9 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
         </section>
         <section selectionAdvancedFilter class="grid gap-siaf-md">
           <span class="relative">
-            <select class="h-11 w-full appearance-none rounded-siaf-md border border-[var(--sys-color-border-states-enabled)] bg-surface px-siaf-sm text-sm text-text outline-none" [value]="procesoFiltroBorrador()" (change)="procesoFiltroBorrador.set($any($event.target).value)">
-              <option value="" disabled>Proceso</option>
-              <option value="Todos">Todos</option>
-            </select>
-            <siaf-icon class="pointer-events-none absolute right-siaf-sm top-1/2 -translate-y-1/2" name="keyboard_arrow_down" [size]="24" />
-          </span>
-          <span class="relative">
             <select class="h-11 w-full appearance-none rounded-siaf-md border border-[var(--sys-color-border-states-enabled)] bg-surface px-siaf-sm text-sm text-text outline-none" [value]="filtroProcesoBorrador()" (change)="filtroProcesoBorrador.set($any($event.target).value)">
               <option value="" disabled>Tipo de proceso</option>
+              <option value="todos">Todos</option>
               <option value="proceso">Proceso</option>
               <option value="procedimiento">Procedimiento</option>
               <option value="clasificadores">Clasificadores</option>
@@ -503,7 +488,6 @@ export class RelacionPerfilCategoriaComponent {
   readonly busquedaProceso = signal('');
   readonly filtroProceso = signal('todos');
   readonly filtroProcesoBorrador = signal('todos');
-  readonly procesoFiltroBorrador = signal('');
   readonly filtroAvanzadoAbierto = signal(false);
   readonly filtroProcesoAplicado = signal(false);
   readonly busquedaRol = signal('');
@@ -589,6 +573,10 @@ export class RelacionPerfilCategoriaComponent {
     { id: 'ct-17', nivel: 1, texto: 'CEL-001-CT17 Catálogo Relación de Ingresos por Fuente' },
     { id: 'ct-18', nivel: 1, texto: 'CEL-001-CT18 Catálogo Relación de Objeto del Gasto por Fuente' },
     { id: 'ct-28', nivel: 1, texto: 'CEL-001-CT28 Catálogo Ámbito Categoría Presupuestaria' },
+    { id: 'programacion', nivel: 1, texto: 'M02.01 Programación de Recursos Públicos' },
+    { id: 'multianual', nivel: 2, texto: 'M02.01.02 Programación Multianual, Formulación y Aprobación Presupuestaria' },
+    { id: 'multianual-presupuestaria', nivel: 3, texto: 'M02.01.02.01 Programación Multianual Presupuestaria' },
+    { id: 'reportes-apm', nivel: 4, texto: 'M02.01.02.01.01 Programación Multianual Presupuestaria - Gestión de Reportes de la APM' },
   ];
 
   readonly columnasRol: SelectionColumn[] = [
@@ -622,6 +610,7 @@ export class RelacionPerfilCategoriaComponent {
     const termino = terminoIngresado === 'todos' ? '' : terminoIngresado;
     let raizActual = '';
     return this.procesos.filter((proceso) => {
+      if ((this.filtroProceso() === 'proceso' || this.filtroProceso() === 'procedimiento') && proceso.id !== 'programacion') return false;
       if (this.filtroProceso() === 'clasificadores' && !proceso.texto.startsWith('CEL-001-CL')) return false;
       if (this.filtroProceso() === 'catalogos' && !proceso.texto.startsWith('CEL-001-CT')) return false;
       if (termino && !proceso.texto.toLocaleLowerCase().includes(termino)) return false;
@@ -850,9 +839,8 @@ export class RelacionPerfilCategoriaComponent {
     this.busquedaProceso.set('');
     this.filtroProceso.set('todos');
     this.filtroProcesoBorrador.set('');
-    this.procesoFiltroBorrador.set('');
     this.filtroAvanzadoAbierto.set(false);
-    this.filtroProcesoAplicado.set(false);
+    this.filtroProcesoAplicado.set(true);
     this.panelProcesoAbierto.set(true);
   }
 
@@ -873,7 +861,9 @@ export class RelacionPerfilCategoriaComponent {
   }
 
   aplicarFiltroAvanzado(): void {
-    this.filtroProceso.set(this.filtroProcesoBorrador() || 'todos');
+    const filtro = this.filtroProcesoBorrador() || 'todos';
+    this.filtroProceso.set(filtro);
+    this.procesosSeleccionados.set(filtro === 'proceso' || filtro === 'procedimiento' ? ['programacion'] : []);
     this.filtroProcesoAplicado.set(true);
     this.filtroAvanzadoAbierto.set(false);
   }
@@ -881,7 +871,6 @@ export class RelacionPerfilCategoriaComponent {
   limpiarFiltroProceso(): void {
     this.filtroProceso.set('todos');
     this.filtroProcesoBorrador.set('');
-    this.procesoFiltroBorrador.set('');
     this.filtroProcesoAplicado.set(true);
   }
 
