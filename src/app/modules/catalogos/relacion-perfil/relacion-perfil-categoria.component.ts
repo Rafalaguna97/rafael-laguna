@@ -610,7 +610,8 @@ export class RelacionPerfilCategoriaComponent {
     const termino = terminoIngresado === 'todos' ? '' : terminoIngresado;
     let raizActual = '';
     return this.procesos.filter((proceso) => {
-      if ((this.filtroProceso() === 'proceso' || this.filtroProceso() === 'procedimiento') && proceso.id !== 'programacion') return false;
+      const soloRecursosPublicos = this.filtroProceso() === 'proceso' || this.filtroProceso() === 'procedimiento';
+      if (soloRecursosPublicos && !['programacion', 'multianual', 'multianual-presupuestaria', 'reportes-apm'].includes(proceso.id)) return false;
       if (this.filtroProceso() === 'clasificadores' && !proceso.texto.startsWith('CEL-001-CL')) return false;
       if (this.filtroProceso() === 'catalogos' && !proceso.texto.startsWith('CEL-001-CT')) return false;
       if (termino && !proceso.texto.toLocaleLowerCase().includes(termino)) return false;
@@ -864,6 +865,9 @@ export class RelacionPerfilCategoriaComponent {
     const filtro = this.filtroProcesoBorrador() || 'todos';
     this.filtroProceso.set(filtro);
     this.procesosSeleccionados.set(filtro === 'proceso' || filtro === 'procedimiento' ? ['programacion'] : []);
+    if (filtro === 'proceso' || filtro === 'procedimiento') {
+      this.ramasContraidas.update((ramas) => ramas.filter((rama) => rama !== 'programacion'));
+    }
     this.filtroProcesoAplicado.set(true);
     this.filtroAvanzadoAbierto.set(false);
   }
