@@ -524,10 +524,16 @@ export class RelacionPerfilCategoriaComponent {
   readonly busquedaRegistro = signal('');
 
   readonly registrosDisponibles = [
-    { codigo: 'CEL-001-CT15', proceso: 'CT15 CT Catálogo de Estructura Funcional Programática', rol: '1 Creador', perfil: 'EFP PP', ambito: '1 PP', estado: 'Sí' },
-    { codigo: 'CEL-001-CT15-APNOP-AC', proceso: 'CT15 CT Catálogo de Estructura Funcional Programática', rol: '1 Creador', perfil: 'EFP APNOP y AC', ambito: '6 APNOP, AC', estado: 'Sí' },
-    { codigo: 'CEL-001-CT12', proceso: 'CT12 CT Catálogo de Finalidades', rol: '1 Creador', perfil: 'EFP PP', ambito: '1 PP', estado: 'Sí' },
-    { codigo: 'CEL-001-CT12-APNOP-AC', proceso: 'CT12 CT Catálogo de Finalidades', rol: '1 Creador', perfil: 'EFP APNOP y AC', ambito: '6 APNOP, AC', estado: 'Sí' },
+    { codigo: 'CT12-CREADOR-PP', proceso: 'CEL-001-CT12 Catálogo de Actividades', rol: '1 Creador', perfil: '1 DGPP - Actividades PP', ambito: '1 PP', estado: 'Sí' },
+    { codigo: 'CT12-CREADOR-APNOP-AC', proceso: 'CEL-001-CT12 Catálogo de Actividades', rol: '1 Creador', perfil: '2 DGPP - Actividades APNOP y AC', ambito: '5 APNOP, AC', estado: 'Sí' },
+    { codigo: 'CT12-EVALUADOR-PP', proceso: 'CEL-001-CT12 Catálogo de Actividades', rol: '2 Evaluador', perfil: '1 DGPP - Actividades PP', ambito: '1 PP', estado: 'Sí' },
+    { codigo: 'CT12-EVALUADOR-APNOP-AC', proceso: 'CEL-001-CT12 Catálogo de Actividades', rol: '2 Evaluador', perfil: '2 DGPP - Actividades APNOP y AC', ambito: '5 APNOP, AC', estado: 'Sí' },
+    { codigo: 'CT12-APROBADOR-PP', proceso: 'CEL-001-CT12 Catálogo de Actividades', rol: '3 Aprobador', perfil: '1 DGPP - Actividades PP', ambito: '1 PP', estado: 'Sí' },
+    { codigo: 'CT12-APROBADOR-APNOP-AC', proceso: 'CEL-001-CT12 Catálogo de Actividades', rol: '3 Aprobador', perfil: '2 DGPP - Actividades APNOP y AC', ambito: '5 APNOP, AC', estado: 'Sí' },
+    { codigo: 'CT15-CREADOR-PP', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '3 DGPP - EFP PP', ambito: '1 PP', estado: 'Sí' },
+    { codigo: 'CT15-CREADOR-APNOP-AC', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '4 DGPP - EFP APNOP y AC', ambito: '5 APNOP, AC', estado: 'Sí' },
+    { codigo: 'CT15-EVALUADOR-PP', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '2 Evaluador', perfil: '3 DGPP - EFP PP', ambito: '1 PP', estado: 'Sí' },
+    { codigo: 'CT15-APROBADOR-PP', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '3 Aprobador', perfil: '3 DGPP - EFP PP', ambito: '1 PP', estado: 'Sí' },
   ];
 
   readonly columnasRegistroModificacion: SelectionColumn[] = [
