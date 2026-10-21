@@ -76,7 +76,7 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
         <div class="hidden shrink-0 items-center gap-siaf-sm lg:flex">
           @if (solicitudEnEdicion()) {
             <siaf-button variant="secondary" icon="close" (click)="cancelarEdicionSolicitud()">Cancelar</siaf-button>
-            <siaf-button variant="secondary" icon="save" [disabled]="!cambiosEdicionPendientes()" (click)="abrirConfirmacionGrabado()">Grabar</siaf-button>
+            <siaf-button variant="secondary" icon="save" [disabled]="!cambiosEdicionPendientes() || !ambito()" (click)="abrirConfirmacionGrabado()">Grabar</siaf-button>
             <siaf-button variant="secondary" icon="task_alt" [disabled]="true">Verificar</siaf-button>
           } @else if (solicitudElaborada() && !solicitudEliminada() && !solicitudAceptada()) {
             <siaf-button variant="secondary" icon="delete" (click)="abrirConfirmacionEliminarSolicitud()">Eliminar</siaf-button>
@@ -84,7 +84,7 @@ import { TextFieldComponent } from '../../../shared/ui/text-field/text-field.com
             <siaf-button icon="task_alt" (click)="abrirConfirmacionVerificacion()">Verificar</siaf-button>
           } @else if (!solicitudElaborada()) {
             <siaf-button variant="secondary" icon="close" (click)="cancelarEdicion()">Cancelar</siaf-button>
-            <siaf-button variant="secondary" icon="save" [disabled]="!registroGuardado()" (click)="abrirConfirmacionGrabado()">Grabar</siaf-button>
+            <siaf-button variant="secondary" icon="save" [disabled]="!registroGuardado() || !ambito()" (click)="abrirConfirmacionGrabado()">Grabar</siaf-button>
             <siaf-button variant="secondary" icon="task_alt" [disabled]="true">Verificar</siaf-button>
           }
         </div>
@@ -524,10 +524,10 @@ export class RelacionPerfilCategoriaComponent {
   readonly busquedaRegistro = signal('');
 
   readonly registrosDisponibles = [
-    { codigo: 'CEL-001-CT15', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Sí' },
-    { codigo: 'CEL-001-CT10', proceso: 'CEL-001-CT10 Catálogo Programas Presupuestales', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '2 APNOP', estado: 'Sí' },
-    { codigo: 'CEL-001-CT11', proceso: 'CEL-001-CT11 Catálogo Productos', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '2 APNOP', estado: 'Sí' },
-    { codigo: 'CEL-001-CT12', proceso: 'CEL-001-CT12 Catalogo Actividades', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Sí' },
+    { codigo: 'CEL-001-CT15', proceso: 'CT15 CT Catálogo de Estructura Funcional Programática', rol: '1 Creador', perfil: 'EFP PP', ambito: '1 PP', estado: 'Sí' },
+    { codigo: 'CEL-001-CT15-APNOP-AC', proceso: 'CT15 CT Catálogo de Estructura Funcional Programática', rol: '1 Creador', perfil: 'EFP APNOP y AC', ambito: '6 APNOP, AC', estado: 'Sí' },
+    { codigo: 'CEL-001-CT12', proceso: 'CT12 CT Catálogo de Finalidades', rol: '1 Creador', perfil: 'EFP PP', ambito: '1 PP', estado: 'Sí' },
+    { codigo: 'CEL-001-CT12-APNOP-AC', proceso: 'CT12 CT Catálogo de Finalidades', rol: '1 Creador', perfil: 'EFP APNOP y AC', ambito: '6 APNOP, AC', estado: 'Sí' },
   ];
 
   readonly columnasRegistroModificacion: SelectionColumn[] = [
