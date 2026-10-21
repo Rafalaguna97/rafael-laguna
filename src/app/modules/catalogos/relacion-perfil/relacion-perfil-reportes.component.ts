@@ -41,8 +41,8 @@ const FILAS: QueryReportRow[] = [
             <h3 class="mb-siaf-lg mt-siaf-xl text-sm font-bold uppercase">Relación perfil por ámbito de categoría presupuestaria</h3>
             <div class="relative"><siaf-form-table-search [value]="busquedaTabla()" (valueChange)="busquedaTabla.set($event)" (more)="alternarMenuTabla()" />@if (menuTablaAbierto()) { <div class="absolute right-0 top-12 z-20 w-[270px] rounded-siaf-sm bg-[var(--sys-color-bg-states-light-selected)] p-siaf-xs shadow-siaf-elevation-2"><button class="w-full rounded-siaf-sm px-siaf-sm py-siaf-md text-left text-xs font-bold text-[var(--sys-color-text-neutral-activated)]" type="button" (click)="menuTablaAbierto.set(false); abrirConfiguracion()">Configuración de tabla</button></div> }</div>
             <div class="mt-siaf-md"><siaf-filter-pill label="Estado de registro" [options]="opcionesEstado" [selectedValue]="filtroEstado()" (selectedValueChange)="filtroEstado.set($event)" /></div>
-            <div class="mt-siaf-xl min-h-0 flex-1"><siaf-report-table [columns]="configuracion().columns" [rows]="filasVisibles()" rowKey="id" ariaLabel="Relaciones de perfil por ámbito" /></div>
-            <siaf-pagination navigation="Activate" position="Bottom" [rowPage]="true" [page]="1" [pageSize]="10" [rowsPerPage]="10" [totalItems]="filasVisibles().length" [totalPages]="1" />
+            <div class="mt-siaf-xl min-h-0 shrink-0"><siaf-report-table [columns]="configuracion().columns" [rows]="filasVisibles()" rowKey="id" ariaLabel="Relaciones de perfil por ámbito" /></div>
+            <siaf-pagination class="mt-siaf-md shrink-0" navigation="Activate" position="Bottom" [rowPage]="true" [page]="1" [pageSize]="10" [rowsPerPage]="10" [totalItems]="filasVisibles().length" [totalPages]="1" />
           </section>
         </div>
       }
