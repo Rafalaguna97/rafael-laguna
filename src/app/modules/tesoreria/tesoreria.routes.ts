@@ -4,6 +4,7 @@ import { Routes } from '@angular/router';
 export const TESORERIA_ROUTES: Routes = [
   {
     path: 'procesos/catalogos/relacion-perfil-ambito-categoria-presupuestaria',
+    data: { permissions: ['document.read'] },
     loadComponent: () =>
       import('../catalogos/relacion-perfil/relacion-perfil-categoria.component').then(
         (m) => m.RelacionPerfilCategoriaComponent,

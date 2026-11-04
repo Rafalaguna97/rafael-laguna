@@ -60,6 +60,10 @@ export const DEFAULT_PROCESS_TREE: ProcessMenuNode[] = [
             id: 'catalogo-relacion-perfil-ambito-categoria-presupuestaria',
             label: 'Catálogo de relación perfil por ámbito de categoría presupuestaria',
             moduleRoute: '/procesos/catalogos/relacion-perfil-ambito-categoria-presupuestaria',
+            // El árbol de Procesos puede consumirse también desde vistas que
+            // solo conocen createRoute. Ambas rutas deben abrir la portada
+            // del catálogo, no dejar el panel abierto.
+            createRoute: '/procesos/catalogos/relacion-perfil-ambito-categoria-presupuestaria',
           },
         ],
       },
