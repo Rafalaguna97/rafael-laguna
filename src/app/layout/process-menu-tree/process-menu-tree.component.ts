@@ -124,12 +124,12 @@ export { DEFAULT_PROCESS_TREE, findProcessPathById } from '../../shared/utils/pr
               [attr.aria-expanded]="hasChildren(node) ? isExpanded(node) : null"
               (click)="activate(node)"
             >
-              @if (hasChildren(node)) {
+              @if (hasChildren(node) || node.showCollapsedIndicator) {
                 <siaf-icon
                   class="mr-siaf-md shrink-0 text-[var(--sys-color-text-neutral-activated)] transition-transform duration-150"
                   name="arrow_drop_down"
                   [size]="20"
-                  [class.-rotate-90]="!isExpanded(node)"
+                  [class.-rotate-90]="!hasChildren(node) || !isExpanded(node)"
                 />
               }
 

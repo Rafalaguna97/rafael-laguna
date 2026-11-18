@@ -11,6 +11,8 @@ export interface ProcessMenuNode {
   selected?: boolean;
   // Solo debe marcarse en nodos raiz: la vista inicial muestra hasta el segundo nivel.
   expanded?: boolean;
+  /** Muestra un indicador de subnivel cerrado aunque el detalle aún no esté disponible. */
+  showCollapsedIndicator?: boolean;
   // Ruta de la página principal del módulo (documentos y registros)
   moduleRoute?: string;
   // Si un nodo tiene estas propiedades, Crear documento puede completar documento/tipo y navegar.
@@ -49,6 +51,7 @@ export const DEFAULT_PROCESS_TREE: ProcessMenuNode[] = [
       {
         id: 'clasificadores',
         label: 'Clasificadores',
+        showCollapsedIndicator: true,
       },
       {
         id: 'catalogos',
