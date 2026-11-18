@@ -26,6 +26,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/ui-kit/ui-kit-vista.component').then((m) => m.UiKitVistaComponent)
   },
+  // Enlace público para revisar el catálogo sin iniciar sesión.
+  {
+    path: 'propuesta/relacion-perfil-ambito-categoria-presupuestaria',
+    loadComponent: () =>
+      import('./modules/catalogos/relacion-perfil/relacion-perfil-categoria.component').then(
+        (m) => m.RelacionPerfilCategoriaComponent,
+      ),
+  },
   {
     path: '',
     loadComponent: () =>
