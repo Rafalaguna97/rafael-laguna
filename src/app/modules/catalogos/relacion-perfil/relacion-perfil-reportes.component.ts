@@ -16,10 +16,10 @@ import { IconDropdownMenuComponent } from '../../../shared/ui/icon-dropdown-menu
 import { ReportTableComponent } from '../../../shared/ui/report-table/report-table.component';
 
 const FILAS: QueryReportRow[] = [
-  { id: '1', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Sí', desde: '19/08/2026', hasta: '' },
-  { id: '2', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '4 Dirección General de Presupuesto Público - EFP APNOP y AC', ambito: '6 APNOP, AC', estado: 'Sí', desde: '19/08/2026', hasta: '' },
-  { id: '3', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '2 Evaluador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Sí', desde: '19/08/2026', hasta: '' },
-  { id: '4', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '3 Aprobador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Sí', desde: '19/08/2026', hasta: '' },
+  { id: '1', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Activo', desde: '19/08/2026', hasta: '' },
+  { id: '2', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '1 Creador', perfil: '4 Dirección General de Presupuesto Público - EFP APNOP y AC', ambito: '6 APNOP, AC', estado: 'Activo', desde: '19/08/2026', hasta: '' },
+  { id: '3', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '2 Evaluador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Activo', desde: '19/08/2026', hasta: '' },
+  { id: '4', proceso: 'CEL-001-CT15 Catálogo de Estructura Funcional Programática - EFP', rol: '3 Aprobador', perfil: '3 Dirección General de Presupuesto Público - EFP PP', ambito: '1 PP', estado: 'Activo', desde: '19/08/2026', hasta: '' },
 ];
 
 /** Consulta del catálogo de relaciones: parte desde el acceso «Consultas y reportes» del Panel. */
@@ -75,7 +75,7 @@ export class RelacionPerfilReportesComponent {
   readonly configuracionAbierta = signal(false);
   readonly columnasActivas = signal<string[]>(['proceso', 'rol', 'perfil', 'ambito', 'estado', 'desde', 'hasta']);
   readonly borradorColumnas = signal<string[]>([]);
-  readonly opcionesEstado = [{ label: 'Sí', value: 'Sí' }, { label: 'No', value: 'No' }];
+  readonly opcionesEstado = [{ label: 'Activo', value: 'Activo' }, { label: 'Inactivo', value: 'Inactivo' }];
   readonly opcionesExportacion = [{ label: 'CSV', value: 'csv', icon: 'table_chart' }, { label: 'Excel', value: 'excel', icon: 'table_view' }, { label: 'PDF', value: 'pdf', icon: 'picture_as_pdf' }];
 
   readonly columnasBase = [
@@ -103,7 +103,7 @@ export class RelacionPerfilReportesComponent {
       { key: 'rol', label: 'Rol', type: 'select', icon: 'badge', options: [{ label: '1 Creador', value: '1 Creador' }, { label: '2 Evaluador', value: '2 Evaluador' }, { label: '3 Aprobador', value: '3 Aprobador' }] },
       { key: 'perfil', label: 'Perfil', type: 'select', icon: 'person', options: [{ label: 'EFP PP', value: 'EFP PP' }, { label: 'EFP APNOP y AC', value: 'EFP APNOP y AC' }] },
       { key: 'ambito', label: 'Ámbito de categoría presupuestaria', type: 'select', icon: 'category', options: [{ label: '1 PP', value: '1 PP' }, { label: '6 APNOP, AC', value: '6 APNOP, AC' }] },
-      { key: 'estado', label: 'Estado de vigencia', type: 'select', icon: 'toggle_on', options: [{ label: 'Sí', value: 'Sí' }, { label: 'No', value: 'No' }] },
+      { key: 'estado', label: 'Estado de vigencia', type: 'select', icon: 'toggle_on', options: [{ label: 'Activo', value: 'Activo' }, { label: 'Inactivo', value: 'Inactivo' }] },
       { key: 'desde', label: 'Fecha de vigencia desde', type: 'date', icon: 'calendar_today' },
       { key: 'hasta', label: 'Fecha de vigencia hasta', type: 'date', icon: 'event' },
     ],
@@ -111,7 +111,7 @@ export class RelacionPerfilReportesComponent {
     rowKey: 'id',
     resultTitle: 'Resultado de la búsqueda',
     tableLabel: 'Relación perfil por ámbito de categoría presupuestaria',
-    presetFilters: [{ key: 'estado', label: 'Estado de registro', options: [{ label: 'Sí', value: 'Sí' }, { label: 'No', value: 'No' }] }],
+    presetFilters: [{ key: 'estado', label: 'Estado de registro', options: [{ label: 'Activo', value: 'Activo' }, { label: 'Inactivo', value: 'Inactivo' }] }],
     emptyTitle: 'Aún no se encontraron resultados',
     emptyDescription: 'Ingrese los criterios de búsqueda para visualizar la información disponible.',
   }));
